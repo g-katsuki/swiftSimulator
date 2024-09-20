@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C78BD47A2C9B0696001E9E49 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD4782C9B0696001E9E49 /* ViewController.swift */; };
+		C78BD47D2C9B0929001E9E49 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD47C2C9B091E001E9E49 /* GameState.swift */; };
+		C78BD47F2C9B093D001E9E49 /* PuyoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD47E2C9B0936001E9E49 /* PuyoView.swift */; };
+		C78BD4812C9B0959001E9E49 /* NextPuyoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD4802C9B0943001E9E49 /* NextPuyoView.swift */; };
 		C7D4D9652C8F2B870038BC5E /* puyoSimulatorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D4D9642C8F2B870038BC5E /* puyoSimulatorApp.swift */; };
 		C7D4D9672C8F2B870038BC5E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D4D9662C8F2B870038BC5E /* ContentView.swift */; };
 		C7D4D9692C8F2B890038BC5E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7D4D9682C8F2B890038BC5E /* Assets.xcassets */; };
@@ -14,6 +18,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C78BD4782C9B0696001E9E49 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		C78BD47C2C9B091E001E9E49 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
+		C78BD47E2C9B0936001E9E49 /* PuyoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuyoView.swift; sourceTree = "<group>"; };
+		C78BD4802C9B0943001E9E49 /* NextPuyoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextPuyoView.swift; sourceTree = "<group>"; };
 		C7D4D9612C8F2B870038BC5E /* puyoSimulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = puyoSimulator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7D4D9642C8F2B870038BC5E /* puyoSimulatorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = puyoSimulatorApp.swift; sourceTree = "<group>"; };
 		C7D4D9662C8F2B870038BC5E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -32,6 +40,31 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C78BD4772C9B0687001E9E49 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				C78BD47C2C9B091E001E9E49 /* GameState.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		C78BD4792C9B0696001E9E49 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				C78BD4782C9B0696001E9E49 /* ViewController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		C78BD47B2C9B069C001E9E49 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C78BD4802C9B0943001E9E49 /* NextPuyoView.swift */,
+				C78BD47E2C9B0936001E9E49 /* PuyoView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		C7D4D9582C8F2B870038BC5E = {
 			isa = PBXGroup;
 			children = (
@@ -51,6 +84,9 @@
 		C7D4D9632C8F2B870038BC5E /* puyoSimulator */ = {
 			isa = PBXGroup;
 			children = (
+				C78BD47B2C9B069C001E9E49 /* Views */,
+				C78BD4792C9B0696001E9E49 /* Controllers */,
+				C78BD4772C9B0687001E9E49 /* Models */,
 				C7D4D9642C8F2B870038BC5E /* puyoSimulatorApp.swift */,
 				C7D4D9662C8F2B870038BC5E /* ContentView.swift */,
 				C7D4D9682C8F2B890038BC5E /* Assets.xcassets */,
@@ -137,7 +173,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C78BD47F2C9B093D001E9E49 /* PuyoView.swift in Sources */,
+				C78BD47A2C9B0696001E9E49 /* ViewController.swift in Sources */,
+				C78BD47D2C9B0929001E9E49 /* GameState.swift in Sources */,
 				C7D4D9672C8F2B870038BC5E /* ContentView.swift in Sources */,
+				C78BD4812C9B0959001E9E49 /* NextPuyoView.swift in Sources */,
 				C7D4D9652C8F2B870038BC5E /* puyoSimulatorApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
