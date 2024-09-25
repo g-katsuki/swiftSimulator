@@ -25,6 +25,6 @@ struct PuyoView: View {
         
         return Circle()
             .fill(color)
-            .frame(width: 30, height: 30)
+            .frame(width: 40, height: 40)
     }
 }

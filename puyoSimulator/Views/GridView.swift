@@ -20,7 +20,7 @@ struct GridView: View {
                         } else {
                             Rectangle()
                                 .fill(Color.gray)
-                                .frame(width: 30, height: 30)
+                                .frame(width: 40, height: 40)
                         }
                     }
                 }

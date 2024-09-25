@@ -24,38 +24,34 @@ struct ContentView: View {
                 Button(action: {
                     movePuyosLeft()
                 }) {
-                    Text("←").padding().background(Color.gray).cornerRadius(8)
+                    Text("←").padding().background(Color.gray).cornerRadius(10)
+                }
+                
+                Button(action: {
+                    applyGravityToPuyos()
+                    placePuyos()
+                }) {
+                    Text("↓").padding().background(Color.gray).cornerRadius(10)
                 }
 
                 Button(action: {
                     movePuyosRight()
                 }) {
-                    Text("→").padding().background(Color.gray).cornerRadius(8)
-                }
-
-                Button(action: {
-                    dropPuyos()  // 一気に下に落とす
-                }) {
-                    Text("↓").padding().background(Color.gray).cornerRadius(8)
-                }
-
-                Button(action: {
-                    placePuyos()  // 現在のぷよを設置する
-                }) {
-                    Text("Place").padding().background(Color.gray).cornerRadius(8)
+                    Text("→").padding().background(Color.gray).cornerRadius(10)
                 }
                 
                 Button(action: {
                     rotatePuyosLeft()  // ぷよを左回転させる
                 }) {
-                    Text("Rotate Left").padding().background(Color.gray).cornerRadius(8)
+                    Text("左").padding().background(Color.gray).cornerRadius(10)
                 }
 
                 Button(action: {
                     rotatePuyosRight()  // ぷよを右回転させる
                 }) {
-                    Text("Rotate Right").padding().background(Color.gray).cornerRadius(8)
+                    Text("右").padding().background(Color.gray).cornerRadius(10)
                 }
+
             }
 
             .padding()
@@ -173,19 +169,6 @@ struct ContentView: View {
 
         return canMove
     }
-
-
-    
-    // ぷよを一番下まで移動
-    func dropPuyos() {
-        print("dropPuyos() が呼ばれました")  // ログを追加
-        var canMove = true
-        
-        // ぷよが下に移動できる限り繰り返す
-        while canMove {
-            canMove = movePuyos(byX: 0, byY: 1)  // 1マス下に移動
-        }
-    }
     
     func rotatePuyosRight() {
         guard currentPuyos.count == 2 else {
@@ -251,7 +234,26 @@ struct ContentView: View {
         print("ぷよを左回転させました: \(newChildPuyoPosition)")
     }
 
+    func applyGravityToPuyos() {
+        // グリッド全体を下から上に向かってスキャン
+        for y in (0..<puyoGrid.height).reversed() {  // 下から上へ
+            for x in 0..<puyoGrid.width {
+                // ぷよがある場合
+                if var puyo = puyoGrid.grid[y][x] {
+                    var currentY = y
 
+                    // 下が空いている限り、ぷよを下まで落とす
+                    while currentY + 1 < puyoGrid.height && puyoGrid.grid[currentY + 1][x] == nil {
+                        puyoGrid.removePuyo(at: (x, currentY))  // 現在の位置から削除
+                        currentY += 1  // 下に移動
+                        puyo.position.1 = currentY  // ぷよの位置を更新
+                        puyoGrid.addPuyo(puyo)  // 新しい位置にぷよを追加
+                    }
+                }
+            }
+        }
+        print("重力による一括落下完了")
+    }
 
 }
 
