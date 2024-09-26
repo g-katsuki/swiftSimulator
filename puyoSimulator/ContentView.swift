@@ -29,6 +29,9 @@ struct ContentView: View {
                 
                 Button(action: {
                     applyGravityToPuyos()
+                    while removeConnectedPuyos() {
+                            applyGravityToPuyos()  // 消えた後にぷよを下に落とす
+                    }
                     placePuyos()
                 }) {
                     Text("↓").padding().background(Color.gray).cornerRadius(10)
@@ -254,6 +257,75 @@ struct ContentView: View {
         }
         print("重力による一括落下完了")
     }
+    
+    struct Position: Hashable {
+        let x: Int
+        let y: Int
+    }
+
+    
+    func findConnectedPuyos(from start: Position) -> [Position] {
+        guard let startPuyo = puyoGrid.grid[start.y][start.x] else { return [] }
+        
+        var stack = [start]
+        var visited = Set<Position>()
+        visited.insert(start)
+        var connectedPuyos = [Position]()
+
+        while !stack.isEmpty {
+            let current = stack.removeLast()
+            connectedPuyos.append(current)
+
+            let neighbors = [
+                Position(x: current.x - 1, y: current.y),  // 左
+                Position(x: current.x + 1, y: current.y),  // 右
+                Position(x: current.x, y: current.y - 1),  // 上
+                Position(x: current.x, y: current.y + 1)   // 下
+            ]
+            
+            for neighbor in neighbors {
+                if neighbor.x >= 0 && neighbor.x < puyoGrid.width && neighbor.y >= 0 && neighbor.y < puyoGrid.height {
+                    if let neighborPuyo = puyoGrid.grid[neighbor.y][neighbor.x],
+                       neighborPuyo.color == startPuyo.color,
+                       !visited.contains(neighbor) {
+                        stack.append(neighbor)
+                        visited.insert(neighbor)
+                    }
+                }
+            }
+        }
+
+        return connectedPuyos
+    }
+
+    
+    func removeConnectedPuyos() -> Bool {
+        var removed = false
+        var visited = Set<Position>()
+
+        // グリッド全体をスキャン
+        for y in 0..<puyoGrid.height {
+            for x in 0..<puyoGrid.width {
+                if let puyo = puyoGrid.grid[y][x], !visited.contains(Position(x: x, y: y)) {
+                    let connectedPuyos = findConnectedPuyos(from: Position(x: x, y: y))
+
+                    // 4つ以上連結していたら消す
+                    if connectedPuyos.count >= 4 {
+                        for position in connectedPuyos {
+                            puyoGrid.removePuyo(at: (position.x, position.y))
+                            visited.insert(position)  // 削除された位置を記録
+                        }
+                        removed = true
+                    }
+                }
+            }
+        }
+
+        return removed
+    }
+
+
+
 
 }
 
