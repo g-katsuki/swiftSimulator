@@ -28,14 +28,11 @@ struct ContentView: View {
                 }
                 
                 Button(action: {
-                    applyGravityToPuyos()
-                    while removeConnectedPuyos() {
-                            applyGravityToPuyos()  // 消えた後にぷよを下に落とす
-                    }
-                    placePuyos()
+                    dropPuyosWithGravityAndRemoveAsync()  // 非同期に連鎖処理を行う
                 }) {
                     Text("↓").padding().background(Color.gray).cornerRadius(10)
                 }
+
 
                 Button(action: {
                     movePuyosRight()
@@ -113,13 +110,6 @@ struct ContentView: View {
         _ = movePuyos(byX: 1, byY: 0)  // 戻り値を無視する
     }
 
-    // ぷよを下に移動
-    func movePuyosDown() {
-        _ = movePuyos(byX: 0, byY: 1)  // 戻り値を無視する
-    }
-
-
-    // 汎用的な移動関数を修正
     // 戻り値として「移動できるかどうか」を返すようにする
     func movePuyos(byX deltaX: Int, byY deltaY: Int) -> Bool {
         var canMove = true
@@ -128,9 +118,6 @@ struct ContentView: View {
         for (index, puyo) in currentPuyos.enumerated() {
             let newX = puyo.position.0 + deltaX
             let newY = puyo.position.1 + deltaY
-
-            // デバッグ用ログ
-            print("チェック中: newX=\(newX), newY=\(newY)")
 
             // 移動できない条件がある場合
             if newX < 0 || newX >= puyoGrid.width || newY < 0 || newY >= puyoGrid.height {
@@ -320,12 +307,27 @@ struct ContentView: View {
                 }
             }
         }
-
         return removed
     }
 
-
+    func dropPuyosWithGravityAndRemoveAsync() {
+        applyGravityToPuyos()  // まずぷよをすべて下に落とす
+        // 非同期に連鎖処理を行う
+        DispatchQueue.global().async {
+            while self.removeConnectedPuyos() {
+                // メインスレッドでUI更新とグラビティ適用
+                DispatchQueue.main.async {
+                    self.applyGravityToPuyos()
+                }
+                // 0.5秒待機（この間にUIの更新が行われる）
+                Thread.sleep(forTimeInterval: 0.4)
+            }
+            // 最後に新しいぷよを配置
+            DispatchQueue.main.async {
+                self.placePuyos()
+            }
+        }
+    }
 
 
 }
-
