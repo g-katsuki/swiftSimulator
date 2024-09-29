@@ -8,73 +8,111 @@ struct ContentView: View {
 
 
     var body: some View {
-        VStack {
-            // グリッドを表示
-            GridView(puyoGrid: $puyoGrid)
+        GeometryReader { geometry in
+            ZStack {
+                // グリッドを表示
+                VStack {
+                    GridView(puyoGrid: $puyoGrid)
 
-            // ネクストぷよを表示
-            Text("Next Puyo")
-            HStack {
-                ForEach(nextPuyos) { puyo in
-                        PuyoView(puyo: puyo)
+                    // 操作ボタンの配置
+                    HStack {
+                        Button(action: {
+                            movePuyosLeft()
+                        }) {
+                            Text("←")
+                                .frame(width: geometry.size.width * 0.15, height: geometry.size.width * 0.15)
+                                .background(Color.gray)
+                                .cornerRadius(10)
+                                .padding(geometry.size.width * 0.01)
+                        }
+
+                        Button(action: {
+                            dropPuyosWithGravityAndRemoveAsync()
+                        }) {
+                            Text("↓")
+                                .frame(width: geometry.size.width * 0.12, height: geometry.size.width * 0.12)
+                                .background(Color.gray)
+                                .cornerRadius(10)
+                                .padding(geometry.size.width * 0.02)
+                        }
+
+                        Button(action: {
+                            movePuyosRight()
+                        }) {
+                            Text("→")
+                                .frame(width: geometry.size.width * 0.15, height: geometry.size.width * 0.15)
+                                .background(Color.gray)
+                                .cornerRadius(10)
+                                .padding(geometry.size.width * 0.01)
+                        }
+
+                        Button(action: {
+                            rotatePuyosLeft()
+                        }) {
+                            Text("L")
+                                .frame(width: geometry.size.width * 0.15, height: geometry.size.width * 0.15)
+                                .background(Color.gray)
+                                .cornerRadius(10)
+                                .padding(geometry.size.width * 0.015)
+                        }
+
+                        Button(action: {
+                            rotatePuyosRight()
+                        }) {
+                            Text("R")
+                                .frame(width: geometry.size.width * 0.15, height: geometry.size.width * 0.15)
+                                .background(Color.gray)
+                                .cornerRadius(10)
+                                .padding(geometry.size.width * 0.015)
+                        }
+                    }
+                    .padding()
+
+                    // 下部に「戻る」ボタンと「リセット」ボタンを配置
+                    HStack {
+                        Button(action: {
+                            restorePuyoGridState()
+                        }) {
+                            Text("戻る").padding().background(Color.gray).cornerRadius(10)
+                        }
+
+                        Button(action: {
+                            resetGame()
+                        }) {
+                            Text("リセット").padding().background(Color.red).foregroundColor(.white).cornerRadius(10)
+                        }
+                    }
+                    .padding(.top, 20)
                 }
+                
+                // ネクストぷよを画面右上に縦に配置
+                VStack {
+                    Spacer()
+                    VStack {
+                        Text("Next Puyo")
+                        ForEach(nextPuyos) { puyo in
+                            PuyoView(puyo: puyo)
+                        }
+                    }
+                    .frame(width: geometry.size.width * 0.15)  // ネクストぷよの幅を画面幅の15%に設定
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(10)
+                    .shadow(radius: 10)
+
+                    Spacer()
+                }
+                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topTrailing)  // 右上に配置
             }
-            .frame(height: 60) // ネクストぷよの表示用
-
-            // 移動用のコントロールボタン
-            HStack {
-                Button(action: {
-                    restorePuyoGridState()  // 状態を復元する
-                }) {
-                    Text("戻る").padding().background(Color.gray).cornerRadius(10)
-                }
-
-                Button(action: {
-                    movePuyosLeft()
-                }) {
-                    Text("←").padding().background(Color.gray).cornerRadius(10)
-                }
-                
-                Button(action: {
-                    dropPuyosWithGravityAndRemoveAsync()
-                }) {
-                    Text("↓").padding().background(Color.gray).cornerRadius(10)
-                }
-
-                Button(action: {
-                    movePuyosRight()
-                }) {
-                    Text("→").padding().background(Color.gray).cornerRadius(10)
-                }
-                
-                Button(action: {
-                    rotatePuyosLeft()  // ぷよを左回転させる
-                }) {
-                    Text("左").padding().background(Color.gray).cornerRadius(10)
-                }
-
-                Button(action: {
-                    rotatePuyosRight()  // ぷよを右回転させる
-                }) {
-                    Text("右").padding().background(Color.gray).cornerRadius(10)
-                }
-                
-                Button(action: {
-                    resetGame()  // 全体のリセット
-                }) {
-                    Text("リセット").padding().background(Color.red).foregroundColor(.white).cornerRadius(10)
-                }
-
-
+            .onAppear {
+                setupNewPuyos()  // 最初のぷよとネクストぷよを表示
             }
-
-            .padding()
-        }
-        .onAppear {
-            // 最初のぷよとネクストぷよを表示
-            setupNewPuyos()
         }
     }
+
+
+
+
 
     // 新しいぷよのセットアップ
     func setupNewPuyos() {
@@ -94,6 +132,7 @@ struct ContentView: View {
 
         // グリッドとぷよの状態を履歴に保存
         savePuyoGridState()
+        nextPuyoHistory.append(nextPuyos)
     }
 
     // ぷよを設置し、次のぷよを現在のぷよにする
