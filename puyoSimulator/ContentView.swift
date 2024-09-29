@@ -11,9 +11,11 @@ struct ContentView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
+                Color(white: 0.2).edgesIgnoringSafeArea(.all)
                 // グリッドを表示
                 VStack {
                     GridView(puyoGrid: $puyoGrid)
+                        .padding(.trailing, geometry.size.width * 0.2)
 
                     // 操作ボタンの配置
                     HStack {
@@ -88,20 +90,19 @@ struct ContentView: View {
                 
                 // ネクストぷよを画面右上に縦に配置
                 VStack {
-                    Spacer()
                     VStack {
-                        Text("Next Puyo")
+                        Text("Next")
                         ForEach(nextPuyos) { puyo in
                             PuyoView(puyo: puyo)
                         }
-                        Text("NextD Puyo")
+                        Text("---")
                         ForEach(nextdPuyos) { puyo in
                             PuyoView(puyo: puyo)
                         }
                     }
                     .frame(width: geometry.size.width * 0.15)  // ネクストぷよの幅を画面幅の15%に設定
                     .padding()
-                    .background(Color.white)
+                    .background(Color(.gray))
                     .cornerRadius(10)
                     .shadow(radius: 10)
 
@@ -435,17 +436,14 @@ struct ContentView: View {
         
         nextdPuyos = nextPuyos
         nextPuyos = currentPuyos
+        // currentPuyoの位置ごと戻してしまうので初期位置に戻す
+        nextPuyos[0].position = (2,0)
+        nextPuyos[1].position = (2,1)
         
-
         currentHistoryIndex -= 1  // インデックスを1つ戻す
         let previousState = puyoGridHistory[currentHistoryIndex]  // 1つ前の状態を取得
         puyoGrid.grid = previousState.grid  // グリッドを復元
         currentPuyos = previousState.currentPuyos  // currentPuyosを復元
-        
-
-        // nextPuyosも履歴から復元
-//        nextPuyos = nextPuyoHistory[currentHistoryIndex + 1]
-//        nextdPuyos = nextPuyoHistory[currentHistoryIndex + 2]
     }
     
     func resetGame() {
