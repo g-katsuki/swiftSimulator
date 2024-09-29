@@ -58,6 +58,13 @@ struct ContentView: View {
                 }) {
                     Text("右").padding().background(Color.gray).cornerRadius(10)
                 }
+                
+                Button(action: {
+                    resetGame()  // 全体のリセット
+                }) {
+                    Text("リセット").padding().background(Color.red).foregroundColor(.white).cornerRadius(10)
+                }
+
 
             }
 
@@ -379,5 +386,27 @@ struct ContentView: View {
         // nextPuyosも履歴から復元
         nextPuyos = nextPuyoHistory[currentHistoryIndex]
     }
+    
+    func resetGame() {
+        // グリッドをリセット（全てのぷよを削除）
+        for y in 0..<puyoGrid.height {
+            for x in 0..<puyoGrid.width {
+                puyoGrid.grid[y][x] = nil
+            }
+        }
+        
+        // 現在のぷよとネクストぷよをリセット
+        currentPuyos.removeAll()
+        nextPuyos.removeAll()
+
+        // 履歴をリセット
+        puyoGridHistory.removeAll()
+        nextPuyoHistory.removeAll()
+        currentHistoryIndex = -1
+
+        // 最初のぷよを生成してゲームを再開
+        setupNewPuyos()
+    }
+
 
 }
