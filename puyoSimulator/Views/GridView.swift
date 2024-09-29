@@ -11,16 +11,21 @@ struct GridView: View {
     @Binding var puyoGrid: PuyoGrid
 
     var body: some View {
-        VStack(spacing: 2) {
-            ForEach(0..<puyoGrid.height, id: \.self) { y in
-                HStack(spacing: 2) {
-                    ForEach(0..<puyoGrid.width, id: \.self) { x in
-                        if let puyo = puyoGrid.grid[y][x] {
-                            PuyoView(puyo: puyo)
-                        } else {
+        VStack(spacing: 0) {  // マス目の間に少し隙間を作る
+            ForEach(0..<puyoGrid.height, id: \.self) { row in
+                HStack(spacing: 0) {  // 横のマスにも隙間を作る
+                    ForEach(0..<puyoGrid.width, id: \.self) { column in
+                        ZStack {
+                            // グリッドの背景を常に描画（背景がゲーム画面にならないようにする）
                             Rectangle()
-                                .fill(Color.gray)
-                                .frame(width: 40, height: 40)
+                                .fill(Color(white: 0.3))  // グリッドの背景色を設定
+                                .frame(width: 40, height: 40)  // グリッドの各マスの大きさ
+
+                            // ぷよが存在する場合、そのぷよを描画
+                            if let puyo = puyoGrid.grid[row][column] {
+                                PuyoView(puyo: puyo)
+                                    .frame(width: 40, height: 40)  // ぷよの大きさ
+                            }
                         }
                     }
                 }
@@ -28,4 +33,5 @@ struct GridView: View {
         }
     }
 }
+
 

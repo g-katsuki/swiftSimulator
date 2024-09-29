@@ -102,7 +102,7 @@ struct ContentView: View {
                     }
                     .frame(width: geometry.size.width * 0.15)  // ネクストぷよの幅を画面幅の15%に設定
                     .padding()
-                    .background(Color(.gray))
+                    .background(Color(white: 0.3))
                     .cornerRadius(10)
                     .shadow(radius: 10)
 
