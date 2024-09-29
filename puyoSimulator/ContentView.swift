@@ -4,6 +4,7 @@ struct ContentView: View {
     @State private var puyoGrid = PuyoGrid(width: 6, height: 12)
     @State private var currentPuyos: [Puyo] = []  // 現在操作中のぷよ
     @State private var nextPuyos: [Puyo] = []     // ネクストぷよ
+    @State private var nextdPuyos: [Puyo] = []     // ダブルネクストぷよ
     @State private var nextPuyoHistory: [[Puyo]] = []  // nextPuyos用の履歴
 
 
@@ -93,6 +94,10 @@ struct ContentView: View {
                         ForEach(nextPuyos) { puyo in
                             PuyoView(puyo: puyo)
                         }
+                        Text("NextD Puyo")
+                        ForEach(nextdPuyos) { puyo in
+                            PuyoView(puyo: puyo)
+                        }
                     }
                     .frame(width: geometry.size.width * 0.15)  // ネクストぷよの幅を画面幅の15%に設定
                     .padding()
@@ -125,6 +130,10 @@ struct ContentView: View {
         let nextFirstPuyo = Puyo(color: randomPuyoColor(), position: (2, 0))
         let nextSecondPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
         nextPuyos = [nextFirstPuyo, nextSecondPuyo]
+        
+        let nextdFirstPuyo = Puyo(color: randomPuyoColor(), position: (2, 0))
+        let nextdSecondPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
+        nextdPuyos = [nextdFirstPuyo, nextdSecondPuyo]
 
         // グリッドに現在のぷよを追加
         puyoGrid.addPuyo(currentPuyos[0])
@@ -133,24 +142,31 @@ struct ContentView: View {
         // グリッドとぷよの状態を履歴に保存
         savePuyoGridState()
         nextPuyoHistory.append(nextPuyos)
+        nextPuyoHistory.append(nextdPuyos)
     }
 
     // ぷよを設置し、次のぷよを現在のぷよにする
     func placePuyos() {
         
         currentPuyos = nextPuyos  // ネクストぷよをcurrentPuyosに移動
+        nextPuyos = nextdPuyos
+        
+        print("---")
+        print(currentHistoryIndex)
+        print(nextPuyoHistory.count)
+        print("---")
         
         // ネクストぷよを履歴から復元するか、新しく生成
-        if currentHistoryIndex < nextPuyoHistory.count - 1{
+        if currentHistoryIndex < nextPuyoHistory.count - 2{
             // 履歴からネクストぷよを取得（次の履歴に進む）
-            nextPuyos = nextPuyoHistory[currentHistoryIndex+1]
+            nextdPuyos = nextPuyoHistory[currentHistoryIndex+2]
         } else {
             // 履歴がない場合、新しくネクストぷよを生成
             let firstPuyo = Puyo(color: randomPuyoColor(), position: (2, 0))
             let secondPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
-            nextPuyos = [firstPuyo, secondPuyo]
+            nextdPuyos = [firstPuyo, secondPuyo]
             
-            nextPuyoHistory.append(nextPuyos)
+            nextPuyoHistory.append(nextdPuyos)
         }
 
         // 現在のぷよをグリッドに追加
@@ -416,14 +432,20 @@ struct ContentView: View {
 
     func restorePuyoGridState() {
         guard currentHistoryIndex > 0 else { return }  // インデックスが0より大きい場合のみ戻す
+        
+        nextdPuyos = nextPuyos
+        nextPuyos = currentPuyos
+        
 
         currentHistoryIndex -= 1  // インデックスを1つ戻す
         let previousState = puyoGridHistory[currentHistoryIndex]  // 1つ前の状態を取得
         puyoGrid.grid = previousState.grid  // グリッドを復元
         currentPuyos = previousState.currentPuyos  // currentPuyosを復元
+        
 
         // nextPuyosも履歴から復元
-        nextPuyos = nextPuyoHistory[currentHistoryIndex]
+//        nextPuyos = nextPuyoHistory[currentHistoryIndex + 1]
+//        nextdPuyos = nextPuyoHistory[currentHistoryIndex + 2]
     }
     
     func resetGame() {
