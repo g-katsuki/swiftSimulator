@@ -245,8 +245,10 @@ struct ContentView: View {
         let relativeX = childPuyo.position.0 - axisPuyo.position.0
         let relativeY = childPuyo.position.1 - axisPuyo.position.1
         var newChildPuyoPosition: (Int, Int) = (axisPuyo.position.0 - relativeY, axisPuyo.position.1 + relativeX)
-        let newParentPuyoPosition: (Int, Int)
-        
+        var newParentPuyoPosition: (Int, Int) = (axisPuyo.position.0, axisPuyo.position.0)
+        print(childPuyo.position.1)
+        print(axisPuyo.position.1)
+        print(axisPuyo.position.0 - relativeY)
         if axisPuyo.position.0 - relativeY >= puyoGrid.width {
             print("AAA")
             newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
@@ -261,11 +263,20 @@ struct ContentView: View {
                 if relativeY < 0 { // 子ぷよが上
                     newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
                     newParentPuyoPosition = (axisPuyo.position.0 - 1, axisPuyo.position.1 + relativeX)
+                    if puyoGrid.grid[newParentPuyoPosition.1][newParentPuyoPosition.0] != nil { // rotete 180
+                        newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX + 1)
+                        newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
+                    }
                 } else if relativeY > 0 { // 子ぷよが下
                     newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
                     newParentPuyoPosition = (axisPuyo.position.0 + 1, axisPuyo.position.1 + relativeX)
+                    if puyoGrid.grid[newParentPuyoPosition.1][newParentPuyoPosition.0] != nil { // rotete 180
+                        newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX - 1)
+                        newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
+                    }
                 } else {
-                    return
+                    newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX - 1)
+                    newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX - 2)
                 }
             } else {
                 newChildPuyoPosition = (axisPuyo.position.0 - relativeY, axisPuyo.position.1 + relativeX)
@@ -273,17 +284,6 @@ struct ContentView: View {
                 print("BBB")
             }
         }
-        
-        // 回転先がグリッド範囲内か、他のぷよに衝突しないか確認
-//        if newChildPuyoPosition.0 < 0 || newChildPuyoPosition.0 >= puyoGrid.width ||
-//           newChildPuyoPosition.1 < 0 || newChildPuyoPosition.1 >= puyoGrid.height ||
-//           puyoGrid.grid[newChildPuyoPosition.1][newChildPuyoPosition.0] != nil {
-//            return  // 回転できない場合は何もしない
-//        }
-//        if newChildPuyoPosition.1 < 0 || newChildPuyoPosition.1 >= puyoGrid.height ||
-//           puyoGrid.grid[newChildPuyoPosition.1][newChildPuyoPosition.0] != nil {
-//            return  // 回転できない場合は何もしない
-//        }
         
         // グリッドから古い位置のぷよを削除
         puyoGrid.removePuyo(at: childPuyo.position)
@@ -300,33 +300,63 @@ struct ContentView: View {
     }
 
     func rotatePuyosLeft() {
-        guard currentPuyos.count == 2 else {
-            return  // 2つのぷよがなければ回転しない
-        }
-        
-        let axisPuyo = currentPuyos[1]  // 軸ぷよ（下側のぷよ）
-        let childPuyo = currentPuyos[0]  // 子ぷよ（上側のぷよ）
+        let axisPuyo = currentPuyos[1]  // 軸ぷよ
+        let childPuyo = currentPuyos[0]  // 子ぷよ
 
-        // 子ぷよの相対的な位置を計算し、左回転（反時計回り）
+        // 子ぷよの相対的な位置を計算し、左回転
         let relativeX = childPuyo.position.0 - axisPuyo.position.0
         let relativeY = childPuyo.position.1 - axisPuyo.position.1
-        let newChildPuyoPosition: (Int, Int) = (axisPuyo.position.0 + relativeY, axisPuyo.position.1 - relativeX)
-
-        // 回転先がグリッド範囲内か、他のぷよに衝突しないか確認
-        if newChildPuyoPosition.0 < 0 || newChildPuyoPosition.0 >= puyoGrid.width ||
-           newChildPuyoPosition.1 < 0 || newChildPuyoPosition.1 >= puyoGrid.height ||
-           puyoGrid.grid[newChildPuyoPosition.1][newChildPuyoPosition.0] != nil {
-            return  // 回転できない場合は何もしない
+        var newChildPuyoPosition: (Int, Int) = (axisPuyo.position.0 + relativeY, axisPuyo.position.1 - relativeX)
+        var newParentPuyoPosition: (Int, Int) = (axisPuyo.position.0, axisPuyo.position.0)
+        print(childPuyo.position.1)
+        print(axisPuyo.position.1)
+        print(axisPuyo.position.0 - relativeY)
+        if axisPuyo.position.0 + relativeY >= puyoGrid.width {
+            print("AAA")
+            newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
+            newParentPuyoPosition = (axisPuyo.position.0 - 1, axisPuyo.position.1 + relativeX)
         }
-
+        else if axisPuyo.position.0 + relativeY == -1 {
+            print("CCC")
+            newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 - relativeX)
+            newParentPuyoPosition = (axisPuyo.position.0 + 1, axisPuyo.position.1 + relativeX)
+        } else { // 壁とは離れている
+            if puyoGrid.grid[newChildPuyoPosition.1][newChildPuyoPosition.0] != nil { // ぷよに衝突
+                if relativeY < 0 { // 子ぷよが上
+                    newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 - relativeX)
+                    newParentPuyoPosition = (axisPuyo.position.0 + 1, axisPuyo.position.1 + relativeX)
+                    if puyoGrid.grid[newParentPuyoPosition.1][newParentPuyoPosition.0] != nil { // rotete 180
+                        newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX + 1)
+                        newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
+                    }
+                } else if relativeY > 0 { // 子ぷよが下
+                    newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
+                    newParentPuyoPosition = (axisPuyo.position.0 - 1, axisPuyo.position.1 + relativeX)
+                    if puyoGrid.grid[newParentPuyoPosition.1][newParentPuyoPosition.0] != nil { // rotete 180
+                        newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX - 1)
+                        newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
+                    }
+                } else {
+                    newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX + 1)
+                    newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
+                }
+            } else {
+                newChildPuyoPosition = (axisPuyo.position.0 + relativeY, axisPuyo.position.1 - relativeX)
+                newParentPuyoPosition = axisPuyo.position
+                print("BBB")
+            }
+        }
+        
         // グリッドから古い位置のぷよを削除
         puyoGrid.removePuyo(at: childPuyo.position)
 
         // 新しい位置にぷよを移動
         currentPuyos[0].position = newChildPuyoPosition
+        currentPuyos[1].position = newParentPuyoPosition
 
         // グリッドに新しい位置のぷよを追加
         puyoGrid.addPuyo(currentPuyos[0])
+        puyoGrid.addPuyo(currentPuyos[1])
 
         print("ぷよを左回転させました: \(newChildPuyoPosition)")
     }
