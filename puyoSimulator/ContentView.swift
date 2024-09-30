@@ -124,16 +124,16 @@ struct ContentView: View {
     func setupNewPuyos() {
 
         // 新しいぷよを生成
-        let firstPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
-        let secondPuyo = Puyo(color: randomPuyoColor(), position: (2, 2))
+        let firstPuyo = Puyo(color: randomPuyoColor(), position: (2, 0))
+        let secondPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
         currentPuyos = [firstPuyo, secondPuyo]
 
-        let nextFirstPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
-        let nextSecondPuyo = Puyo(color: randomPuyoColor(), position: (2, 2))
+        let nextFirstPuyo = Puyo(color: randomPuyoColor(), position: (2, 0))
+        let nextSecondPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
         nextPuyos = [nextFirstPuyo, nextSecondPuyo]
         
-        let nextdFirstPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
-        let nextdSecondPuyo = Puyo(color: randomPuyoColor(), position: (2, 2))
+        let nextdFirstPuyo = Puyo(color: randomPuyoColor(), position: (2, 0))
+        let nextdSecondPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
         nextdPuyos = [nextdFirstPuyo, nextdSecondPuyo]
 
         // グリッドに現在のぷよを追加
@@ -163,8 +163,8 @@ struct ContentView: View {
             nextdPuyos = nextPuyoHistory[currentHistoryIndex+2]
         } else {
             // 履歴がない場合、新しくネクストぷよを生成
-            let firstPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
-            let secondPuyo = Puyo(color: randomPuyoColor(), position: (2, 2))
+            let firstPuyo = Puyo(color: randomPuyoColor(), position: (2, 0))
+            let secondPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
             nextdPuyos = [firstPuyo, secondPuyo]
             
             nextPuyoHistory.append(nextdPuyos)
@@ -240,6 +240,10 @@ struct ContentView: View {
     func rotatePuyosRight() {
         let axisPuyo = currentPuyos[1]  // 軸ぷよ
         let childPuyo = currentPuyos[0]  // 子ぷよ
+        
+        if childPuyo.position.1 == 0 && childPuyo.position.0 < axisPuyo.position.0 {
+            return
+        }
 
         // 子ぷよの相対的な位置を計算し、右回転（時計回り）
         let relativeX = childPuyo.position.0 - axisPuyo.position.0
@@ -266,6 +270,10 @@ struct ContentView: View {
                     if puyoGrid.grid[newParentPuyoPosition.1][newParentPuyoPosition.0] != nil { // rotete 180
                         newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX + 1)
                         newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
+                        if puyoGrid.grid[newChildPuyoPosition.1][newChildPuyoPosition.0] != nil { // 180の先にぷよが存在
+                            newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
+                            newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX - 1)
+                        }
                     }
                 } else if relativeY > 0 { // 子ぷよが下
                     newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
@@ -285,8 +293,14 @@ struct ContentView: View {
             }
         }
         
+        // 移動先が範囲外なら何もせず終了
+        if newChildPuyoPosition.1 < 0 || newParentPuyoPosition.1 < 0 {
+            return
+        }
+        
         // グリッドから古い位置のぷよを削除
         puyoGrid.removePuyo(at: childPuyo.position)
+        puyoGrid.removePuyo(at: axisPuyo.position)
 
         // 新しい位置にぷよを移動
         currentPuyos[0].position = newChildPuyoPosition
@@ -302,6 +316,10 @@ struct ContentView: View {
     func rotatePuyosLeft() {
         let axisPuyo = currentPuyos[1]  // 軸ぷよ
         let childPuyo = currentPuyos[0]  // 子ぷよ
+        
+        if childPuyo.position.1 == 0 && childPuyo.position.0 > axisPuyo.position.0 {
+            return
+        }
 
         // 子ぷよの相対的な位置を計算し、左回転
         let relativeX = childPuyo.position.0 - axisPuyo.position.0
@@ -328,6 +346,11 @@ struct ContentView: View {
                     if puyoGrid.grid[newParentPuyoPosition.1][newParentPuyoPosition.0] != nil { // rotete 180
                         newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX + 1)
                         newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
+                        if puyoGrid.grid[newChildPuyoPosition.1][newChildPuyoPosition.0] != nil { // 180の先にぷよが存在
+                            print("hh")
+                            newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
+                            newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX - 1)
+                        }
                     }
                 } else if relativeY > 0 { // 子ぷよが下
                     newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
@@ -347,8 +370,14 @@ struct ContentView: View {
             }
         }
         
+        // 移動先が範囲外なら何もせず終了
+        if newChildPuyoPosition.1 < 0 || newParentPuyoPosition.1 < 0 {
+            return
+        }
+        
         // グリッドから古い位置のぷよを削除
         puyoGrid.removePuyo(at: childPuyo.position)
+        puyoGrid.removePuyo(at: axisPuyo.position)
 
         // 新しい位置にぷよを移動
         currentPuyos[0].position = newChildPuyoPosition
@@ -497,8 +526,8 @@ struct ContentView: View {
         nextdPuyos = nextPuyos
         nextPuyos = currentPuyos
         // currentPuyoの位置ごと戻してしまうので初期位置に戻す
-        nextPuyos[0].position = (2,1)
-        nextPuyos[1].position = (2,2)
+        nextPuyos[0].position = (2,0)
+        nextPuyos[1].position = (2,1)
         
         currentHistoryIndex -= 1  // インデックスを1つ戻す
         let previousState = puyoGridHistory[currentHistoryIndex]  // 1つ前の状態を取得
