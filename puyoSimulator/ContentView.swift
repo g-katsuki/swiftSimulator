@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var puyoGrid = PuyoGrid(width: 6, height: 12)
+    @State private var puyoGrid = PuyoGrid(width: 6, height: 13)
     @State private var currentPuyos: [Puyo] = []  // 現在操作中のぷよ
     @State private var nextPuyos: [Puyo] = []     // ネクストぷよ
     @State private var nextdPuyos: [Puyo] = []     // ダブルネクストぷよ
@@ -124,16 +124,16 @@ struct ContentView: View {
     func setupNewPuyos() {
 
         // 新しいぷよを生成
-        let firstPuyo = Puyo(color: randomPuyoColor(), position: (2, 0))
-        let secondPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
+        let firstPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
+        let secondPuyo = Puyo(color: randomPuyoColor(), position: (2, 2))
         currentPuyos = [firstPuyo, secondPuyo]
 
-        let nextFirstPuyo = Puyo(color: randomPuyoColor(), position: (2, 0))
-        let nextSecondPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
+        let nextFirstPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
+        let nextSecondPuyo = Puyo(color: randomPuyoColor(), position: (2, 2))
         nextPuyos = [nextFirstPuyo, nextSecondPuyo]
         
-        let nextdFirstPuyo = Puyo(color: randomPuyoColor(), position: (2, 0))
-        let nextdSecondPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
+        let nextdFirstPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
+        let nextdSecondPuyo = Puyo(color: randomPuyoColor(), position: (2, 2))
         nextdPuyos = [nextdFirstPuyo, nextdSecondPuyo]
 
         // グリッドに現在のぷよを追加
@@ -163,8 +163,8 @@ struct ContentView: View {
             nextdPuyos = nextPuyoHistory[currentHistoryIndex+2]
         } else {
             // 履歴がない場合、新しくネクストぷよを生成
-            let firstPuyo = Puyo(color: randomPuyoColor(), position: (2, 0))
-            let secondPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
+            let firstPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
+            let secondPuyo = Puyo(color: randomPuyoColor(), position: (2, 2))
             nextdPuyos = [firstPuyo, secondPuyo]
             
             nextPuyoHistory.append(nextdPuyos)
@@ -407,7 +407,7 @@ struct ContentView: View {
             ]
             
             for neighbor in neighbors {
-                if neighbor.x >= 0 && neighbor.x < puyoGrid.width && neighbor.y >= 0 && neighbor.y < puyoGrid.height {
+                if neighbor.y > 0 && neighbor.x >= 0 && neighbor.x < puyoGrid.width && neighbor.y < puyoGrid.height {
                     if let neighborPuyo = puyoGrid.grid[neighbor.y][neighbor.x],
                        neighborPuyo.color == startPuyo.color,
                        !visited.contains(neighbor) {
@@ -427,7 +427,7 @@ struct ContentView: View {
         var visited = Set<Position>()
 
         // グリッド全体をスキャン
-        for y in 0..<puyoGrid.height {
+        for y in 1..<puyoGrid.height {
             for x in 0..<puyoGrid.width {
                 if let _ = puyoGrid.grid[y][x], !visited.contains(Position(x: x, y: y)) {
                     let connectedPuyos = findConnectedPuyos(from: Position(x: x, y: y))
@@ -497,8 +497,8 @@ struct ContentView: View {
         nextdPuyos = nextPuyos
         nextPuyos = currentPuyos
         // currentPuyoの位置ごと戻してしまうので初期位置に戻す
-        nextPuyos[0].position = (2,0)
-        nextPuyos[1].position = (2,1)
+        nextPuyos[0].position = (2,1)
+        nextPuyos[1].position = (2,2)
         
         currentHistoryIndex -= 1  // インデックスを1つ戻す
         let previousState = puyoGridHistory[currentHistoryIndex]  // 1つ前の状態を取得
