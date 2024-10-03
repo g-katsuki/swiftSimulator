@@ -22,3 +22,19 @@ struct Puyo: Identifiable {
     var color: PuyoColor
     var position: (Int, Int)
 }
+
+extension PuyoColor {
+    // PuyoColor を SwiftUI の Color に変換
+    var swiftUIColor: Color {
+        switch self {
+        case .red:
+            return Color.red
+        case .blue:
+            return Color.blue
+        case .green:
+            return Color.green
+        case .yellow:
+            return Color.yellow
+        }
+    }
+}
