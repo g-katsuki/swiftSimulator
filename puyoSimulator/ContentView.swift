@@ -78,6 +78,10 @@ struct ContentView: View {
                         }) {
                             Text("戻る").padding().background(Color.gray).cornerRadius(10)
                         }
+                        
+                        // ボタンの間にスペースを追加
+                        Spacer()
+                            .frame(width: geometry.size.width * 0.4, height: geometry.size.width * 0)
 
                         Button(action: {
                             resetGame()
