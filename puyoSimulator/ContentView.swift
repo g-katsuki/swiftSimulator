@@ -120,10 +120,6 @@ struct ContentView: View {
         }
     }
 
-
-
-
-
     // 新しいぷよのセットアップ
     func setupNewPuyos() {
 
@@ -155,11 +151,6 @@ struct ContentView: View {
         
         currentPuyos = nextPuyos  // ネクストぷよをcurrentPuyosに移動
         nextPuyos = nextdPuyos
-        
-        print("---")
-        print(currentHistoryIndex)
-        print(nextPuyoHistory.count)
-        print("---")
         
         // ネクストぷよを履歴から復元するか、新しく生成
         if currentHistoryIndex < nextPuyoHistory.count - 2{
@@ -234,8 +225,6 @@ struct ContentView: View {
             for puyo in currentPuyos {
                 puyoGrid.addPuyo(puyo)
             }
-
-            print("ぷよを移動しました")
         }
 
         return canMove
@@ -254,16 +243,12 @@ struct ContentView: View {
         let relativeY = childPuyo.position.1 - axisPuyo.position.1
         var newChildPuyoPosition: (Int, Int) = (axisPuyo.position.0 - relativeY, axisPuyo.position.1 + relativeX)
         var newParentPuyoPosition: (Int, Int) = (axisPuyo.position.0, axisPuyo.position.0)
-        print(childPuyo.position.1)
-        print(axisPuyo.position.1)
-        print(axisPuyo.position.0 - relativeY)
+
         if axisPuyo.position.0 - relativeY >= puyoGrid.width {
-            print("AAA")
             newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
             newParentPuyoPosition = (axisPuyo.position.0 - 1, axisPuyo.position.1 + relativeX)
         }
         else if axisPuyo.position.0 - relativeY == -1 {
-            print("CCC")
             newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
             newParentPuyoPosition = (axisPuyo.position.0 + 1, axisPuyo.position.1 + relativeX)
         } else { // 壁とは離れている
@@ -293,7 +278,6 @@ struct ContentView: View {
             } else {
                 newChildPuyoPosition = (axisPuyo.position.0 - relativeY, axisPuyo.position.1 + relativeX)
                 newParentPuyoPosition = axisPuyo.position
-                print("BBB")
             }
         }
         
@@ -313,8 +297,6 @@ struct ContentView: View {
         // グリッドに新しい位置のぷよを追加
         puyoGrid.addPuyo(currentPuyos[0])
         puyoGrid.addPuyo(currentPuyos[1])
-
-        print("ぷよを右回転させました: \(newChildPuyoPosition)")
     }
 
     func rotatePuyosLeft() {
@@ -330,16 +312,12 @@ struct ContentView: View {
         let relativeY = childPuyo.position.1 - axisPuyo.position.1
         var newChildPuyoPosition: (Int, Int) = (axisPuyo.position.0 + relativeY, axisPuyo.position.1 - relativeX)
         var newParentPuyoPosition: (Int, Int) = (axisPuyo.position.0, axisPuyo.position.0)
-        print(childPuyo.position.1)
-        print(axisPuyo.position.1)
-        print(axisPuyo.position.0 - relativeY)
+
         if axisPuyo.position.0 + relativeY >= puyoGrid.width {
-            print("AAA")
             newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
             newParentPuyoPosition = (axisPuyo.position.0 - 1, axisPuyo.position.1 + relativeX)
         }
         else if axisPuyo.position.0 + relativeY == -1 {
-            print("CCC")
             newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 - relativeX)
             newParentPuyoPosition = (axisPuyo.position.0 + 1, axisPuyo.position.1 + relativeX)
         } else { // 壁とは離れている
@@ -351,7 +329,6 @@ struct ContentView: View {
                         newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX + 1)
                         newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
                         if puyoGrid.grid[newChildPuyoPosition.1][newChildPuyoPosition.0] != nil { // 180の先にぷよが存在
-                            print("hh")
                             newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
                             newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX - 1)
                         }
@@ -370,7 +347,6 @@ struct ContentView: View {
             } else {
                 newChildPuyoPosition = (axisPuyo.position.0 + relativeY, axisPuyo.position.1 - relativeX)
                 newParentPuyoPosition = axisPuyo.position
-                print("BBB")
             }
         }
         
@@ -390,8 +366,6 @@ struct ContentView: View {
         // グリッドに新しい位置のぷよを追加
         puyoGrid.addPuyo(currentPuyos[0])
         puyoGrid.addPuyo(currentPuyos[1])
-
-        print("ぷよを左回転させました: \(newChildPuyoPosition)")
     }
 
     func applyGravityToPuyos() {
@@ -489,7 +463,7 @@ struct ContentView: View {
                     self.applyGravityToPuyos()
                 }
                 // 0.5秒待機（この間にUIの更新が行われる）
-                Thread.sleep(forTimeInterval: 0.4)
+                Thread.sleep(forTimeInterval: 0.5)
             }
             // 最後に新しいぷよを配置
             DispatchQueue.main.async {
@@ -563,7 +537,7 @@ struct ContentView: View {
     
     struct GridView: View {
         @Binding var puyoGrid: PuyoGrid
-//
+
         var body: some View {
             VStack(spacing: 0) {  // マス目の間に少し隙間を作る
                 ForEach(0..<puyoGrid.height, id: \.self) { row in
@@ -615,7 +589,6 @@ struct ContentView: View {
 
         // ぷよが特定の隣の位置と連結しているかどうかを判定する関数
         func isConnected(at currentPosition: (Int, Int), to neighborPosition: (Int, Int), in connectedPuyos: [Position]) -> Bool {
-            let (currentRow, currentColumn) = currentPosition
             let (neighborRow, neighborColumn) = neighborPosition
             
             // 隣接している場所がグリッドの範囲内であり、連結している場合に true を返す
@@ -656,12 +629,8 @@ struct ContentView: View {
                     }
                 }
             }
-
             return connectedPuyos
         }
-
     }
-
-
 
 }
