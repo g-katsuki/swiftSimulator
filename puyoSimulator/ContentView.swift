@@ -6,6 +6,7 @@ struct ContentView: View {
     @State private var nextPuyos: [Puyo] = []     // ネクストぷよ
     @State private var nextdPuyos: [Puyo] = []     // ダブルネクストぷよ
     @State private var nextPuyoHistory: [[Puyo]] = []  // nextPuyos用の履歴
+    @State private var savedNextPuyoHistories: [[Puyo]] = []  // 2次元配列として保存
 
 
     var body: some View {
@@ -80,8 +81,35 @@ struct ContentView: View {
                         }
                         
                         // ボタンの間にスペースを追加
-                        Spacer()
-                            .frame(width: geometry.size.width * 0.4, height: geometry.size.width * 0)
+//                        Spacer()
+//                            .frame(width: geometry.size.width * 0.4, height: geometry.size.width * 0)
+                        
+                        Button(action: {
+                            // ネクストぷよの履歴を保存してUserDefaultsに書き込む
+                            savedNextPuyoHistories.append(nextPuyos)
+                            saveNextPuyoHistoryToUserDefaults()
+                        }) {
+                            Text("保存")
+                                .padding()
+                                .background(Color.blue)
+                                .foregroundColor(Color.white)
+                                .cornerRadius(10)
+                        }
+
+                        Button(action: {
+                            // UserDefaultsから履歴を読み込んでネクストぷよを上書き
+                            loadNextPuyoHistoryFromUserDefaults()
+                            if !savedNextPuyoHistories.isEmpty {
+                                nextPuyos = savedNextPuyoHistories.last ?? []
+                            }
+                        }) {
+                            Text("履歴を呼び出す")
+                                .padding()
+                                .background(Color.green)
+                                .foregroundColor(Color.white)
+                                .cornerRadius(10)
+                        }
+
 
                         Button(action: {
                             resetGame()
@@ -116,6 +144,7 @@ struct ContentView: View {
             }
             .onAppear {
                 setupNewPuyos()  // 最初のぷよとネクストぷよを表示
+                loadNextPuyoHistoryFromUserDefaults()  // 履歴をロード
             }
         }
     }
@@ -124,16 +153,16 @@ struct ContentView: View {
     func setupNewPuyos() {
 
         // 新しいぷよを生成
-        let firstPuyo = Puyo(color: randomPuyoColor(), position: (2, 0))
-        let secondPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
+        let firstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  0))
+        let secondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  1))
         currentPuyos = [firstPuyo, secondPuyo]
 
-        let nextFirstPuyo = Puyo(color: randomPuyoColor(), position: (2, 0))
-        let nextSecondPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
+        let nextFirstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  0))
+        let nextSecondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  1))
         nextPuyos = [nextFirstPuyo, nextSecondPuyo]
         
-        let nextdFirstPuyo = Puyo(color: randomPuyoColor(), position: (2, 0))
-        let nextdSecondPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
+        let nextdFirstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  0))
+        let nextdSecondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  1))
         nextdPuyos = [nextdFirstPuyo, nextdSecondPuyo]
 
         // グリッドに現在のぷよを追加
@@ -158,8 +187,8 @@ struct ContentView: View {
             nextdPuyos = nextPuyoHistory[currentHistoryIndex+2]
         } else {
             // 履歴がない場合、新しくネクストぷよを生成
-            let firstPuyo = Puyo(color: randomPuyoColor(), position: (2, 0))
-            let secondPuyo = Puyo(color: randomPuyoColor(), position: (2, 1))
+            let firstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  0))
+            let secondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  1))
             nextdPuyos = [firstPuyo, secondPuyo]
             
             nextPuyoHistory.append(nextdPuyos)
@@ -188,8 +217,8 @@ struct ContentView: View {
 
         // 全てのぷよについて移動後の位置がすべてグリッドの範囲内で空いているか確認
         for (_, puyo) in currentPuyos.enumerated() {
-            let newX = puyo.position.0 + deltaX
-            let newY = puyo.position.1 + deltaY
+            let newX = puyo.position.x + deltaX
+            let newY = puyo.position.y + deltaY
 
             // 移動できない条件がある場合
             if newX < 0 || newX >= puyoGrid.width || newY < 0 || newY >= puyoGrid.height {
@@ -212,13 +241,13 @@ struct ContentView: View {
         if canMove {
             // まずはすべてのぷよをグリッドから削除
             for puyo in currentPuyos {
-                puyoGrid.removePuyo(at: puyo.position)
+                puyoGrid.removePuyo(at: (puyo.position.x, puyo.position.y))
             }
 
             // 新しい位置にすべてのぷよを移動
             for i in 0..<currentPuyos.count {
-                currentPuyos[i].position.0 += deltaX
-                currentPuyos[i].position.1 += deltaY
+                currentPuyos[i].position.x += deltaX
+                currentPuyos[i].position.y += deltaY
             }
 
             // 新しい位置にすべてのぷよを追加
@@ -234,50 +263,50 @@ struct ContentView: View {
         let axisPuyo = currentPuyos[1]  // 軸ぷよ
         let childPuyo = currentPuyos[0]  // 子ぷよ
         
-        if childPuyo.position.1 == 0 && childPuyo.position.0 < axisPuyo.position.0 {
+        if childPuyo.position.x == 0 && childPuyo.position.x < axisPuyo.position.x {
             return
         }
 
         // 子ぷよの相対的な位置を計算し、右回転（時計回り）
-        let relativeX = childPuyo.position.0 - axisPuyo.position.0
-        let relativeY = childPuyo.position.1 - axisPuyo.position.1
-        var newChildPuyoPosition: (Int, Int) = (axisPuyo.position.0 - relativeY, axisPuyo.position.1 + relativeX)
-        var newParentPuyoPosition: (Int, Int) = (axisPuyo.position.0, axisPuyo.position.0)
+        let relativeX = childPuyo.position.x - axisPuyo.position.x
+        let relativeY = childPuyo.position.y - axisPuyo.position.y
+        var newChildPuyoPosition: (Int, Int) = (axisPuyo.position.x - relativeY, axisPuyo.position.y + relativeX)
+        var newParentPuyoPosition: (Int, Int) = (axisPuyo.position.x, axisPuyo.position.x)
 
-        if axisPuyo.position.0 - relativeY >= puyoGrid.width {
-            newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
-            newParentPuyoPosition = (axisPuyo.position.0 - 1, axisPuyo.position.1 + relativeX)
+        if axisPuyo.position.x - relativeY >= puyoGrid.width {
+            newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
+            newParentPuyoPosition = (axisPuyo.position.x - 1, axisPuyo.position.y + relativeX)
         }
-        else if axisPuyo.position.0 - relativeY == -1 {
-            newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
-            newParentPuyoPosition = (axisPuyo.position.0 + 1, axisPuyo.position.1 + relativeX)
+        else if axisPuyo.position.x - relativeY == -1 {
+            newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
+            newParentPuyoPosition = (axisPuyo.position.x + 1, axisPuyo.position.y + relativeX)
         } else { // 壁とは離れている
             if puyoGrid.grid[newChildPuyoPosition.1][newChildPuyoPosition.0] != nil { // ぷよに衝突
                 if relativeY < 0 { // 子ぷよが上
-                    newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
-                    newParentPuyoPosition = (axisPuyo.position.0 - 1, axisPuyo.position.1 + relativeX)
+                    newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
+                    newParentPuyoPosition = (axisPuyo.position.x - 1, axisPuyo.position.y + relativeX)
                     if puyoGrid.grid[newParentPuyoPosition.1][newParentPuyoPosition.0] != nil { // rotete 180
-                        newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX + 1)
-                        newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
+                        newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX + 1)
+                        newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
                         if puyoGrid.grid[newChildPuyoPosition.1][newChildPuyoPosition.0] != nil { // 180の先にぷよが存在
-                            newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
-                            newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX - 1)
+                            newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
+                            newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX - 1)
                         }
                     }
                 } else if relativeY > 0 { // 子ぷよが下
-                    newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
-                    newParentPuyoPosition = (axisPuyo.position.0 + 1, axisPuyo.position.1 + relativeX)
+                    newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
+                    newParentPuyoPosition = (axisPuyo.position.x + 1, axisPuyo.position.y + relativeX)
                     if puyoGrid.grid[newParentPuyoPosition.1][newParentPuyoPosition.0] != nil { // rotete 180
-                        newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX - 1)
-                        newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
+                        newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX - 1)
+                        newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
                     }
                 } else {
-                    newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX - 1)
-                    newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX - 2)
+                    newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX - 1)
+                    newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX - 2)
                 }
             } else {
-                newChildPuyoPosition = (axisPuyo.position.0 - relativeY, axisPuyo.position.1 + relativeX)
-                newParentPuyoPosition = axisPuyo.position
+                newChildPuyoPosition = (axisPuyo.position.x - relativeY, axisPuyo.position.y + relativeX)
+                newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y)
             }
         }
         
@@ -287,13 +316,13 @@ struct ContentView: View {
         }
         
         // グリッドから古い位置のぷよを削除
-        puyoGrid.removePuyo(at: childPuyo.position)
-        puyoGrid.removePuyo(at: axisPuyo.position)
+        puyoGrid.removePuyo(at: (childPuyo.position.x, childPuyo.position.y))
+        puyoGrid.removePuyo(at: (axisPuyo.position.x, axisPuyo.position.y))
 
         // 新しい位置にぷよを移動
-        currentPuyos[0].position = newChildPuyoPosition
-        currentPuyos[1].position = newParentPuyoPosition
-
+        currentPuyos[0].position = Position(x: newChildPuyoPosition.0, y: newChildPuyoPosition.1)
+        currentPuyos[1].position = Position(x: newParentPuyoPosition.0, y: newParentPuyoPosition.1)
+        
         // グリッドに新しい位置のぷよを追加
         puyoGrid.addPuyo(currentPuyos[0])
         puyoGrid.addPuyo(currentPuyos[1])
@@ -303,50 +332,50 @@ struct ContentView: View {
         let axisPuyo = currentPuyos[1]  // 軸ぷよ
         let childPuyo = currentPuyos[0]  // 子ぷよ
         
-        if childPuyo.position.1 == 0 && childPuyo.position.0 > axisPuyo.position.0 {
+        if childPuyo.position.y == 0 && childPuyo.position.x > axisPuyo.position.x {
             return
         }
 
         // 子ぷよの相対的な位置を計算し、左回転
-        let relativeX = childPuyo.position.0 - axisPuyo.position.0
-        let relativeY = childPuyo.position.1 - axisPuyo.position.1
-        var newChildPuyoPosition: (Int, Int) = (axisPuyo.position.0 + relativeY, axisPuyo.position.1 - relativeX)
-        var newParentPuyoPosition: (Int, Int) = (axisPuyo.position.0, axisPuyo.position.0)
+        let relativeX = childPuyo.position.x - axisPuyo.position.x
+        let relativeY = childPuyo.position.y - axisPuyo.position.y
+        var newChildPuyoPosition: (Int, Int) = (axisPuyo.position.x + relativeY, axisPuyo.position.y - relativeX)
+        var newParentPuyoPosition: (Int, Int) = (axisPuyo.position.x, axisPuyo.position.x)
 
-        if axisPuyo.position.0 + relativeY >= puyoGrid.width {
-            newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
-            newParentPuyoPosition = (axisPuyo.position.0 - 1, axisPuyo.position.1 + relativeX)
+        if axisPuyo.position.x + relativeY >= puyoGrid.width {
+            newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
+            newParentPuyoPosition = (axisPuyo.position.x - 1, axisPuyo.position.y + relativeX)
         }
-        else if axisPuyo.position.0 + relativeY == -1 {
-            newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 - relativeX)
-            newParentPuyoPosition = (axisPuyo.position.0 + 1, axisPuyo.position.1 + relativeX)
+        else if axisPuyo.position.x + relativeY == -1 {
+            newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y - relativeX)
+            newParentPuyoPosition = (axisPuyo.position.x + 1, axisPuyo.position.y + relativeX)
         } else { // 壁とは離れている
             if puyoGrid.grid[newChildPuyoPosition.1][newChildPuyoPosition.0] != nil { // ぷよに衝突
                 if relativeY < 0 { // 子ぷよが上
-                    newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 - relativeX)
-                    newParentPuyoPosition = (axisPuyo.position.0 + 1, axisPuyo.position.1 + relativeX)
+                    newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y - relativeX)
+                    newParentPuyoPosition = (axisPuyo.position.x + 1, axisPuyo.position.y + relativeX)
                     if puyoGrid.grid[newParentPuyoPosition.1][newParentPuyoPosition.0] != nil { // rotete 180
-                        newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX + 1)
-                        newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
+                        newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX + 1)
+                        newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
                         if puyoGrid.grid[newChildPuyoPosition.1][newChildPuyoPosition.0] != nil { // 180の先にぷよが存在
-                            newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
-                            newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX - 1)
+                            newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
+                            newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX - 1)
                         }
                     }
                 } else if relativeY > 0 { // 子ぷよが下
-                    newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
-                    newParentPuyoPosition = (axisPuyo.position.0 - 1, axisPuyo.position.1 + relativeX)
+                    newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
+                    newParentPuyoPosition = (axisPuyo.position.x - 1, axisPuyo.position.y + relativeX)
                     if puyoGrid.grid[newParentPuyoPosition.1][newParentPuyoPosition.0] != nil { // rotete 180
-                        newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX - 1)
-                        newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
+                        newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX - 1)
+                        newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
                     }
                 } else {
-                    newChildPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX + 1)
-                    newParentPuyoPosition = (axisPuyo.position.0, axisPuyo.position.1 + relativeX)
+                    newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX + 1)
+                    newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
                 }
             } else {
-                newChildPuyoPosition = (axisPuyo.position.0 + relativeY, axisPuyo.position.1 - relativeX)
-                newParentPuyoPosition = axisPuyo.position
+                newChildPuyoPosition = (axisPuyo.position.x + relativeY, axisPuyo.position.y - relativeX)
+                newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y)
             }
         }
         
@@ -356,12 +385,12 @@ struct ContentView: View {
         }
         
         // グリッドから古い位置のぷよを削除
-        puyoGrid.removePuyo(at: childPuyo.position)
-        puyoGrid.removePuyo(at: axisPuyo.position)
+        puyoGrid.removePuyo(at: (childPuyo.position.x, childPuyo.position.y))
+        puyoGrid.removePuyo(at: (axisPuyo.position.x, axisPuyo.position.y))
 
         // 新しい位置にぷよを移動
-        currentPuyos[0].position = newChildPuyoPosition
-        currentPuyos[1].position = newParentPuyoPosition
+        currentPuyos[0].position = Position(x: newChildPuyoPosition.0, y: newChildPuyoPosition.1)
+        currentPuyos[1].position = Position(x: newParentPuyoPosition.0, y: newParentPuyoPosition.1)
 
         // グリッドに新しい位置のぷよを追加
         puyoGrid.addPuyo(currentPuyos[0])
@@ -380,7 +409,7 @@ struct ContentView: View {
                     while currentY + 1 < puyoGrid.height && puyoGrid.grid[currentY + 1][x] == nil {
                         puyoGrid.removePuyo(at: (x, currentY))  // 現在の位置から削除
                         currentY += 1  // 下に移動
-                        puyo.position.1 = currentY  // ぷよの位置を更新
+                        puyo.position.y = currentY  // ぷよの位置を更新
                         puyoGrid.addPuyo(puyo)  // 新しい位置にぷよを追加
                     }
                 }
@@ -388,10 +417,10 @@ struct ContentView: View {
         }
     }
     
-    struct Position: Hashable {
-        let x: Int
-        let y: Int
-    }
+//    struct Position: Hashable {
+//        let x: Int
+//        let y: Int
+//    }
 
     
     func findConnectedPuyos(from start: Position) -> [Position] {
@@ -504,8 +533,8 @@ struct ContentView: View {
         nextdPuyos = nextPuyos
         nextPuyos = currentPuyos
         // currentPuyoの位置ごと戻してしまうので初期位置に戻す
-        nextPuyos[0].position = (2,0)
-        nextPuyos[1].position = (2,1)
+        nextPuyos[0].position = Position(x: 2, y: 0)
+        nextPuyos[1].position = Position(x: 2, y: 1)
         
         currentHistoryIndex -= 1  // インデックスを1つ戻す
         let previousState = puyoGridHistory[currentHistoryIndex]  // 1つ前の状態を取得
@@ -632,5 +661,24 @@ struct ContentView: View {
             return connectedPuyos
         }
     }
+    
+    func saveNextPuyoHistoryToUserDefaults() {
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(savedNextPuyoHistories) {
+            UserDefaults.standard.set(encoded, forKey: "savedNextPuyoHistories")
+            print("ネクストぷよ履歴を保存しました")
+        }
+    }
+
+    func loadNextPuyoHistoryFromUserDefaults() {
+        if let savedData = UserDefaults.standard.data(forKey: "savedNextPuyoHistories") {
+            let decoder = JSONDecoder()
+            if let loadedHistories = try? decoder.decode([[Puyo]].self, from: savedData) {
+                savedNextPuyoHistories = loadedHistories
+                print("ネクストぷよ履歴を読み込みました")
+            }
+        }
+    }
+
 
 }

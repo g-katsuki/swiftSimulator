@@ -17,7 +17,8 @@ struct PuyoGrid {
     }
 
     mutating func addPuyo(_ puyo: Puyo) {
-        let (x, y) = puyo.position
+        let x = puyo.position.x
+        let y = puyo.position.y
         if x >= 0 && x < width && y >= 0 && y < height {
             grid[y][x] = puyo
         }
