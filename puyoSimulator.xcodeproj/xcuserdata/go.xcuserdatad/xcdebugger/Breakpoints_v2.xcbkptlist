@@ -14,8 +14,8 @@
             filePath = "puyoSimulator/ContentView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "496"
-            endingLineNumber = "496"
+            startingLineNumber = "617"
+            endingLineNumber = "617"
             landmarkName = "dropPuyosWithGravityAndRemoveAsync()"
             landmarkType = "7">
          </BreakpointContent>
@@ -30,8 +30,8 @@
             filePath = "puyoSimulator/ContentView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "153"
-            endingLineNumber = "153"
+            startingLineNumber = "274"
+            endingLineNumber = "274"
             landmarkName = "setupNewPuyos()"
             landmarkType = "7">
          </BreakpointContent>

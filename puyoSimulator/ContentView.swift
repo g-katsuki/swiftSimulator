@@ -7,6 +7,14 @@ struct ContentView: View {
     @State private var nextdPuyos: [Puyo] = []     // ダブルネクストぷよ
     @State private var nextPuyoHistory: [[Puyo]] = []  // nextPuyos用の履歴
     @State private var savedNextPuyoHistories: [[Puyo]] = []  // 2次元配列として保存
+    @State private var historyName: String = ""  // 保存する履歴の名前
+    @State private var savedHistoryNames: [String] = []
+    @State private var selectedHistoryName: String = ""
+    @State private var isShowingSaveSheet = false  // シート表示の状態
+    @State private var isShowingHistorySheet = false  // シート表示の状態
+    @State private var isShowingDeleteSheet = false  // 削除用シートの表示状態
+    @State private var isShowingDeleteConfirmation = false  // 削除確認アラートの状態
+    @State private var historyToDelete: String = ""  // 削除する予定の履歴名
 
 
     var body: some View {
@@ -72,8 +80,9 @@ struct ContentView: View {
                     }
                     .padding()
 
-                    // 下部に「戻る」ボタンと「リセット」ボタンを配置
+                    // 下部に配置
                     HStack {
+                        // 戻るボタン
                         Button(action: {
                             restorePuyoGridState()
                         }) {
@@ -84,10 +93,9 @@ struct ContentView: View {
 //                        Spacer()
 //                            .frame(width: geometry.size.width * 0.4, height: geometry.size.width * 0)
                         
+                        // 保存ボタン（押すとシートが表示される）
                         Button(action: {
-                            // ネクストぷよの履歴を保存してUserDefaultsに書き込む
-                            savedNextPuyoHistories.append(nextPuyos)
-                            saveNextPuyoHistoryToUserDefaults()
+                            isShowingSaveSheet = true  // シートを表示
                         }) {
                             Text("save")
                                 .padding()
@@ -95,19 +103,131 @@ struct ContentView: View {
                                 .foregroundColor(Color.white)
                                 .cornerRadius(10)
                         }
+                        .sheet(isPresented: $isShowingSaveSheet) {
+                            VStack {
+                                Text("履歴の名前を入力")
+                                    .font(.headline)
+                                    .padding()
 
+                                TextField("履歴名", text: $historyName)  // `saveHistoryName` ではなく `historyName`
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .padding()
+
+                                HStack {
+                                    Button(action: {
+                                        // 名前が空でない場合にのみ保存
+                                        if !historyName.isEmpty {
+                                            saveNextPuyoHistoryToUserDefaults(withName: historyName)
+                                            isShowingSaveSheet = false  // シートを閉じる
+                                        }
+                                    }) {
+                                        Text("保存")
+                                            .padding()
+                                            .background(Color.blue)
+                                            .foregroundColor(Color.white)
+                                            .cornerRadius(10)
+                                    }
+
+                                    Button(action: {
+                                        isShowingSaveSheet = false  // シートを閉じる
+                                    }) {
+                                        Text("キャンセル")
+                                            .padding()
+                                            .background(Color.gray)
+                                            .foregroundColor(Color.white)
+                                            .cornerRadius(10)
+                                    }
+                                }
+                            }
+                            .padding()
+                        }
+
+                        // 保存された履歴のリストから選択するためのPicker
+//                       Picker("履歴を選択", selection: $selectedHistoryName) {
+//                           ForEach(savedHistoryNames, id: \.self) { name in
+//                               Text(name).tag(name)
+//                           }
+//                       }
+//                       .pickerStyle(MenuPickerStyle())  // ドロップダウンメニューのスタイル
+//                       .padding()
                         
+                        
+                        // 履歴を呼び出すボタン
                         Button(action: {
-                            loadNextPuyoHistoryFromUserDefaults()  // ネクストぷよの履歴を読み込む
+                            isShowingHistorySheet = true  // シートを表示
                         }) {
-                            Text("履歴を呼び出す")
+                            Text("res")
                                 .padding()
                                 .background(Color.green)
                                 .foregroundColor(Color.white)
                                 .cornerRadius(10)
                         }
+                        .sheet(isPresented: $isShowingHistorySheet) {
+                            // シート内に履歴名のリストを表示して選択できるようにする
+                            VStack {
+                                Text("履歴を選択")
+                                    .font(.headline)
+                                    .padding()
 
+                                List {
+                                    ForEach(savedHistoryNames, id: \.self) { name in
+                                        Button(action: {
+                                            // 履歴名が選択されたらその履歴を読み込む
+                                            loadNextPuyoHistoryFromUserDefaults(withName: name)
+                                            isShowingHistorySheet = false  // シートを閉じる
+                                        }) {
+                                            Text(name)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        
+                        // 履歴を削除するボタン
+                        Button(action: {
+                            isShowingDeleteSheet = true  // 削除用シートを表示
+                        }) {
+                            Text("del")
+                                .padding()
+                                .background(Color.red)
+                                .foregroundColor(Color.white)
+                                .cornerRadius(10)
+                        }
+                        .sheet(isPresented: $isShowingDeleteSheet) {
+                            VStack {
+                                Text("削除する履歴を選択")
+                                    .font(.headline)
+                                    .padding()
 
+                                List {
+                                    ForEach(savedHistoryNames, id: \.self) { name in
+                                        Button(action: {
+                                            // 履歴名を保持してシートを閉じ、アラートを表示
+                                            historyToDelete = name
+                                            isShowingDeleteSheet = false  // シートを閉じる
+
+                                            // シートが閉じた後、少し遅れてアラートを表示
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                                isShowingDeleteConfirmation = true  // 削除確認アラートを表示
+                                            }
+                                        }) {
+                                            Text(name)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .alert(isPresented: $isShowingDeleteConfirmation) {
+                            Alert(
+                                title: Text("履歴を削除"),
+                                message: Text("\(historyToDelete) を本当に削除しますか？"),
+                                primaryButton: .destructive(Text("削除"), action: {
+                                    deleteHistory(withName: historyToDelete)  // 履歴を削除
+                                }),
+                                secondaryButton: .cancel()
+                            )
+                        }
 
 
                         Button(action: {
@@ -143,7 +263,8 @@ struct ContentView: View {
             }
             .onAppear {
                 setupNewPuyos()  // 最初のぷよとネクストぷよを表示
-                loadNextPuyoHistoryFromUserDefaults()  // 履歴をロード
+                loadNextPuyoHistoryFromUserDefaults(withName: selectedHistoryName)  // 履歴をロード
+                loadHistoryNamesFromUserDefaults()  // 保存された履歴名をロード
             }
         }
     }
@@ -657,20 +778,29 @@ struct ContentView: View {
         }
     }
 
-    func saveNextPuyoHistoryToUserDefaults() {
+    func saveNextPuyoHistoryToUserDefaults(withName name: String) {
         let encoder = JSONEncoder()
         if let encoded = try? encoder.encode(nextPuyoHistory) {
-            UserDefaults.standard.set(encoded, forKey: "nextPuyoHistory")
-            print("ネクストぷよ履歴を保存しました")
+            UserDefaults.standard.set(encoded, forKey: name)
+            print("ネクストぷよ履歴を \(name) という名前で保存しました")
+
+            // 保存した名前をリストに追加
+            var savedHistoryNames = UserDefaults.standard.stringArray(forKey: "historyNames") ?? []
+            savedHistoryNames.append(name)
+            UserDefaults.standard.set(savedHistoryNames, forKey: "historyNames")
+            
+            // ローカル変数にも即座に反映
+            self.savedHistoryNames = savedHistoryNames
         }
     }
 
-    func loadNextPuyoHistoryFromUserDefaults() {
-        if let savedData = UserDefaults.standard.data(forKey: "nextPuyoHistory") {
+
+    func loadNextPuyoHistoryFromUserDefaults(withName name: String) {
+        if let savedData = UserDefaults.standard.data(forKey: name) {
             let decoder = JSONDecoder()
             if let loadedHistory = try? decoder.decode([[Puyo]].self, from: savedData) {
                 nextPuyoHistory = loadedHistory
-                print("ネクストぷよ履歴を読み込みました")
+                print("\(name) の履歴を読み込みました")
                 
                 // currentPuyos, nextPuyos, nextdPuyos を復元
                 if nextPuyoHistory.count >= 3 {
@@ -687,6 +817,46 @@ struct ContentView: View {
                 puyoGrid.addPuyo(currentPuyos[1])
             }
         }
+    }
+    
+    func loadHistoryNamesFromUserDefaults() {
+        savedHistoryNames = UserDefaults.standard.stringArray(forKey: "historyNames") ?? []
+    }
+    
+    func deleteHistory(withName name: String) {
+        // 履歴名に対応するデータを削除
+        UserDefaults.standard.removeObject(forKey: name)
+        
+        // 履歴名リストからも削除
+        savedHistoryNames.removeAll { $0 == name }
+        UserDefaults.standard.set(savedHistoryNames, forKey: "historyNames")
+        
+        // ローカル変数も更新
+        self.savedHistoryNames = savedHistoryNames
+        self.selectedHistoryName = ""  // 選択中の履歴名をリセット
+        print("\(name) の履歴を削除しました")
+    }
+    
+    // 全削除
+    func deleteAllHistories() {
+        // すべての履歴名に対応するデータを削除
+        for name in savedHistoryNames {
+            if !name.isEmpty {
+                UserDefaults.standard.removeObject(forKey: name)  // 空でない名前の履歴を削除
+            }
+        }
+        
+        // 空の名前の履歴も削除
+        UserDefaults.standard.removeObject(forKey: "")
+        
+        // 履歴名リストを削除
+        savedHistoryNames.removeAll()
+        UserDefaults.standard.removeObject(forKey: "historyNames")
+        
+        // ローカル変数を更新
+        self.savedHistoryNames = []
+        self.selectedHistoryName = ""  // 選択中の履歴名をリセット
+        print("すべての履歴を削除しました")
     }
 
 
