@@ -77,7 +77,7 @@ struct ContentView: View {
                         Button(action: {
                             restorePuyoGridState()
                         }) {
-                            Text("戻る").padding().background(Color.gray).cornerRadius(10)
+                            Text("back").padding().background(Color.gray).cornerRadius(10)
                         }
                         
                         // ボタンの間にスペースを追加
@@ -89,19 +89,16 @@ struct ContentView: View {
                             savedNextPuyoHistories.append(nextPuyos)
                             saveNextPuyoHistoryToUserDefaults()
                         }) {
-                            Text("保存")
+                            Text("save")
                                 .padding()
                                 .background(Color.blue)
                                 .foregroundColor(Color.white)
                                 .cornerRadius(10)
                         }
 
+                        
                         Button(action: {
-                            // UserDefaultsから履歴を読み込んでネクストぷよを上書き
-                            loadNextPuyoHistoryFromUserDefaults()
-                            if !savedNextPuyoHistories.isEmpty {
-                                nextPuyos = savedNextPuyoHistories.last ?? []
-                            }
+                            loadNextPuyoHistoryFromUserDefaults()  // ネクストぷよの履歴を読み込む
                         }) {
                             Text("履歴を呼び出す")
                                 .padding()
@@ -111,10 +108,12 @@ struct ContentView: View {
                         }
 
 
+
+
                         Button(action: {
                             resetGame()
                         }) {
-                            Text("リセット").padding().background(Color.red).foregroundColor(.white).cornerRadius(10)
+                            Text("reset").padding().background(Color.red).foregroundColor(.white).cornerRadius(10)
                         }
                     }
                     .padding(.top, 20)
@@ -171,6 +170,7 @@ struct ContentView: View {
 
         // グリッドとぷよの状態を履歴に保存
         savePuyoGridState()
+        nextPuyoHistory.append(currentPuyos)
         nextPuyoHistory.append(nextPuyos)
         nextPuyoHistory.append(nextdPuyos)
     }
@@ -182,9 +182,9 @@ struct ContentView: View {
         nextPuyos = nextdPuyos
         
         // ネクストぷよを履歴から復元するか、新しく生成
-        if currentHistoryIndex < nextPuyoHistory.count - 2{
+        if currentHistoryIndex < nextPuyoHistory.count - 1{
             // 履歴からネクストぷよを取得（次の履歴に進む）
-            nextdPuyos = nextPuyoHistory[currentHistoryIndex+2]
+            nextdPuyos = nextPuyoHistory[currentHistoryIndex+1]
         } else {
             // 履歴がない場合、新しくネクストぷよを生成
             let firstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  0))
@@ -416,11 +416,6 @@ struct ContentView: View {
             }
         }
     }
-    
-//    struct Position: Hashable {
-//        let x: Int
-//        let y: Int
-//    }
 
     
     func findConnectedPuyos(from start: Position) -> [Position] {
@@ -661,21 +656,35 @@ struct ContentView: View {
             return connectedPuyos
         }
     }
-    
+
     func saveNextPuyoHistoryToUserDefaults() {
         let encoder = JSONEncoder()
-        if let encoded = try? encoder.encode(savedNextPuyoHistories) {
-            UserDefaults.standard.set(encoded, forKey: "savedNextPuyoHistories")
+        if let encoded = try? encoder.encode(nextPuyoHistory) {
+            UserDefaults.standard.set(encoded, forKey: "nextPuyoHistory")
             print("ネクストぷよ履歴を保存しました")
         }
     }
 
     func loadNextPuyoHistoryFromUserDefaults() {
-        if let savedData = UserDefaults.standard.data(forKey: "savedNextPuyoHistories") {
+        if let savedData = UserDefaults.standard.data(forKey: "nextPuyoHistory") {
             let decoder = JSONDecoder()
-            if let loadedHistories = try? decoder.decode([[Puyo]].self, from: savedData) {
-                savedNextPuyoHistories = loadedHistories
+            if let loadedHistory = try? decoder.decode([[Puyo]].self, from: savedData) {
+                nextPuyoHistory = loadedHistory
                 print("ネクストぷよ履歴を読み込みました")
+                
+                // currentPuyos, nextPuyos, nextdPuyos を復元
+                if nextPuyoHistory.count >= 3 {
+                    // 古いcurrentPuyosを削除
+                    puyoGrid.removePuyo(at: (currentPuyos[0].position.x, currentPuyos[0].position.y))
+                    puyoGrid.removePuyo(at: (currentPuyos[1].position.x, currentPuyos[1].position.y))
+                    
+                    currentPuyos = nextPuyoHistory[0]
+                    nextPuyos = nextPuyoHistory[1]
+                    nextdPuyos = nextPuyoHistory[2]
+                }
+                
+                puyoGrid.addPuyo(currentPuyos[0])
+                puyoGrid.addPuyo(currentPuyos[1])
             }
         }
     }
