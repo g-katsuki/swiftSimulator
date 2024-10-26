@@ -145,16 +145,6 @@ struct ContentView: View {
                             }
                             .padding()
                         }
-
-                        // 保存された履歴のリストから選択するためのPicker
-//                       Picker("履歴を選択", selection: $selectedHistoryName) {
-//                           ForEach(savedHistoryNames, id: \.self) { name in
-//                               Text(name).tag(name)
-//                           }
-//                       }
-//                       .pickerStyle(MenuPickerStyle())  // ドロップダウンメニューのスタイル
-//                       .padding()
-                        
                         
                         // 履歴を呼び出すボタン
                         Button(action: {
@@ -260,8 +250,6 @@ struct ContentView: View {
                     .background(Color(white: 0.3))
                     .cornerRadius(10)
                     .shadow(radius: 10)
-
-//                    Spacer()
                     
                     VStack {
                         // 履歴作成ボタン
@@ -399,22 +387,15 @@ struct ContentView: View {
         currentPuyos = nextPuyos  // ネクストぷよをcurrentPuyosに移動
         nextPuyos = nextdPuyos
         
-        print(currentHistoryIndex)
-        print(nextPuyoHistory.count)
-        
         if (currentHistoryIndex == 0 || currentHistoryIndex == 1 || currentHistoryIndex == 2) &&
             currentHistoryIndex < nextPuyoHistory.count - 3 {
-            print("CCC")
             nextdPuyos = nextPuyoHistory[currentHistoryIndex+3]
         }
         // ネクストぷよを履歴から復元するか、新しく生成
         else if currentHistoryIndex < nextPuyoHistory.count - 3 {
-            print("AAA")
             // 履歴からネクストぷよを取得（次の履歴に進む）
             nextdPuyos = nextPuyoHistory[currentHistoryIndex+3]
         } else {
-            print("BBB")
-
             // 履歴がない場合、新しくネクストぷよを生成
             let firstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  0))
             let secondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  1))
@@ -452,7 +433,6 @@ struct ContentView: View {
             // 移動できない条件がある場合
             if newX < 0 || newX >= puyoGrid.width || newY < 0 || newY >= puyoGrid.height {
                 canMove = false
-                print("ぷよが移動できません: newX=\(newX), newY=\(newY) - 範囲外")
                 break
             }
 
@@ -460,7 +440,6 @@ struct ContentView: View {
             if let otherPuyo = puyoGrid.grid[newY][newX] {
                 if !currentPuyos.contains(where: { $0.id == otherPuyo.id }) {
                     canMove = false
-                    print("ぷよが移動できません: newX=\(newX), newY=\(newY) - 他のぷよに衝突")
                     break
                 }
             }
@@ -890,7 +869,6 @@ struct ContentView: View {
         let encoder = JSONEncoder()
         if let encoded = try? encoder.encode(nextPuyoHistory) {
             UserDefaults.standard.set(encoded, forKey: name)
-            print("ネクストぷよ履歴を \(name) という名前で保存しました")
 
             // 保存した名前をリストに追加
             var savedHistoryNames = UserDefaults.standard.stringArray(forKey: "historyNames") ?? []
@@ -905,31 +883,6 @@ struct ContentView: View {
 
     func loadNextPuyoHistoryFromUserDefaults(withName name: String) {
         
-//        //--------------------------
-//        // resetのcurrentPuyo設定をしたく無いので一部コピペ
-//        // グリッドをリセット（全てのぷよを削除）
-//        for y in 0..<puyoGrid.height {
-//            for x in 0..<puyoGrid.width {
-//                puyoGrid.grid[y][x] = nil
-//            }
-//        }
-//        
-//        // 現在のぷよとネクストぷよをリセット
-//        currentPuyos.removeAll()
-//        nextPuyos.removeAll()
-//
-//        // 履歴をリセット
-//        puyoGridHistory.removeAll()
-//        nextPuyoHistory.removeAll()
-//        currentHistoryIndex = -1
-//        //--------------------------
-        
-        
-        
-//        savePuyoGridState()
-        
-        
-        // なぜこれで解決しない???
         puyoGridHistory.removeAll()
         // 現在のグリッドとcurrentPuyosの状態を保存
         let currentGrid = puyoGrid.grid.map { row in row.map { $0 } }
@@ -938,14 +891,10 @@ struct ContentView: View {
         // グリッドとcurrentPuyosの状態を保存
         puyoGridHistory.append(currentState)
         
-        
-        
-        
         if let savedData = UserDefaults.standard.data(forKey: name) {
             let decoder = JSONDecoder()
             if let loadedHistory = try? decoder.decode([[Puyo]].self, from: savedData) {
                 nextPuyoHistory = loadedHistory
-                print("\(name) の履歴を読み込みました")
                 
                 // currentPuyos, nextPuyos, nextdPuyos を復元
                 if nextPuyoHistory.count >= 3 {
@@ -979,7 +928,6 @@ struct ContentView: View {
         // ローカル変数も更新
         self.savedHistoryNames = savedHistoryNames
         self.selectedHistoryName = ""  // 選択中の履歴名をリセット
-        print("\(name) の履歴を削除しました")
     }
     
     // 全削除
@@ -1001,14 +949,11 @@ struct ContentView: View {
         // ローカル変数を更新
         self.savedHistoryNames = []
         self.selectedHistoryName = ""  // 選択中の履歴名をリセット
-        print("すべての履歴を削除しました")
     }
     
     // 色選択時に順番に追加
     func addColorToSequence(_ color: PuyoColor) {
         createdPuyoSequence.append(color)
-        print("選択された色: \(color)")  // デバッグ用の出力
-        // 必要ならここで選択された色の数を制限できます
     }
 
     // 保存時の処理
@@ -1023,8 +968,6 @@ struct ContentView: View {
             let secondPuyo = Puyo(color: secondPuyoColor, position: Position(x: 2, y: 1))
             createdHistory.append([firstPuyo, secondPuyo])
         }
-
-        print("履歴に保存するPuyoのペア: \(createdHistory)")  // デバッグ用の出力
 
         // 作成した履歴を保存する
         nextPuyoHistory = createdHistory  // 現在の履歴として保存
@@ -1043,7 +986,5 @@ struct ContentView: View {
     func showSaveNameAlert() {
         isShowingSaveAlert = true
     }
-
-
 
 }
