@@ -81,4 +81,18 @@ extension PuyoColor {
             return Color.yellow
         }
     }
+    
+    // PuyoColor を文字列に変換
+    var description: String {
+        switch self {
+        case .red:
+            return "Red"
+        case .green:
+            return "Green"
+        case .blue:
+            return "Blue"
+        case .yellow:
+            return "Yellow"
+        }
+    }
 }

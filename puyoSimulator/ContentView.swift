@@ -15,6 +15,10 @@ struct ContentView: View {
     @State private var isShowingDeleteSheet = false  // 削除用シートの表示状態
     @State private var isShowingDeleteConfirmation = false  // 削除確認アラートの状態
     @State private var historyToDelete: String = ""  // 削除する予定の履歴名
+    @State private var isShowingCreateSheet = false  // シート表示の状態
+    @State private var createdPuyoSequence: [PuyoColor] = []  // 作成中のぷよの色の順番
+    @State private var isShowingSaveAlert = false  // アラート表示のフラグ
+
 
 
     var body: some View {
@@ -257,7 +261,100 @@ struct ContentView: View {
                     .cornerRadius(10)
                     .shadow(radius: 10)
 
-                    Spacer()
+//                    Spacer()
+                    
+                    VStack {
+                        // 履歴作成ボタン
+                        Button(action: {
+                            isShowingCreateSheet = true  // シートを開く
+                        }) {
+                            Text("作成")
+                                .padding()
+                                .background(Color.blue)
+                                .foregroundColor(Color.white)
+                                .cornerRadius(10)
+                        }
+                        .sheet(isPresented: $isShowingCreateSheet) {
+                            VStack {
+                                Text("ぷよの色を選択")
+                                    .font(.headline)
+                                    .padding()
+
+                                // 色の選択ボタン
+                                HStack {
+                                    Button(action: { addColorToSequence(.red) }) {
+                                        Text("赤")
+                                            .padding()
+                                            .background(Color.red)
+                                            .foregroundColor(Color.white)
+                                            .cornerRadius(10)
+                                    }
+
+                                    Button(action: { addColorToSequence(.blue) }) {
+                                        Text("青")
+                                            .padding()
+                                            .background(Color.blue)
+                                            .foregroundColor(Color.white)
+                                            .cornerRadius(10)
+                                    }
+
+                                    Button(action: { addColorToSequence(.yellow) }) {
+                                        Text("黄")
+                                            .padding()
+                                            .background(Color.yellow)
+                                            .foregroundColor(Color.white)
+                                            .cornerRadius(10)
+                                    }
+
+                                    Button(action: { addColorToSequence(.green) }) {
+                                        Text("緑")
+                                            .padding()
+                                            .background(Color.green)
+                                            .foregroundColor(Color.white)
+                                            .cornerRadius(10)
+                                    }
+                                }
+                                .padding()
+
+                                // 選択された色の順序を表示
+                                Text("選択されたぷよ: \(createdPuyoSequence.map { $0.description }.joined(separator: ", "))")
+                                    .padding()
+
+                                // 名前入力用のテキストフィールド
+                                TextField("履歴名", text: $historyName)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .padding()
+
+                                // 保存ボタン
+                                Button(action: {
+                                    saveCreatedHistory()  // 作成した履歴を保存
+                                    isShowingCreateSheet = false  // シートを閉じる
+                                }) {
+                                    Text("保存")
+                                        .padding()
+                                        .background(Color.green)
+                                        .foregroundColor(Color.white)
+                                        .cornerRadius(10)
+                                }
+
+                                // キャンセルボタン
+                                Button(action: {
+                                    isShowingCreateSheet = false  // シートを閉じる
+                                }) {
+                                    Text("キャンセル")
+                                        .padding()
+                                        .background(Color.gray)
+                                        .foregroundColor(Color.white)
+                                        .cornerRadius(10)
+                                }
+                            }
+                            .padding()
+                        }
+                    }
+                    .onAppear {
+                        loadHistoryNamesFromUserDefaults()  // 起動時に履歴名をロード
+                    }
+
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topTrailing)  // 右上に配置
             }
@@ -302,11 +399,22 @@ struct ContentView: View {
         currentPuyos = nextPuyos  // ネクストぷよをcurrentPuyosに移動
         nextPuyos = nextdPuyos
         
+        print(currentHistoryIndex)
+        print(nextPuyoHistory.count)
+        
+        if (currentHistoryIndex == 0 || currentHistoryIndex == 1 || currentHistoryIndex == 2) &&
+            currentHistoryIndex < nextPuyoHistory.count - 3 {
+            print("CCC")
+            nextdPuyos = nextPuyoHistory[currentHistoryIndex+3]
+        }
         // ネクストぷよを履歴から復元するか、新しく生成
-        if currentHistoryIndex < nextPuyoHistory.count - 1{
+        else if currentHistoryIndex < nextPuyoHistory.count - 3 {
+            print("AAA")
             // 履歴からネクストぷよを取得（次の履歴に進む）
-            nextdPuyos = nextPuyoHistory[currentHistoryIndex+1]
+            nextdPuyos = nextPuyoHistory[currentHistoryIndex+3]
         } else {
+            print("BBB")
+
             // 履歴がない場合、新しくネクストぷよを生成
             let firstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  0))
             let secondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  1))
@@ -796,6 +904,43 @@ struct ContentView: View {
 
 
     func loadNextPuyoHistoryFromUserDefaults(withName name: String) {
+        
+//        //--------------------------
+//        // resetのcurrentPuyo設定をしたく無いので一部コピペ
+//        // グリッドをリセット（全てのぷよを削除）
+//        for y in 0..<puyoGrid.height {
+//            for x in 0..<puyoGrid.width {
+//                puyoGrid.grid[y][x] = nil
+//            }
+//        }
+//        
+//        // 現在のぷよとネクストぷよをリセット
+//        currentPuyos.removeAll()
+//        nextPuyos.removeAll()
+//
+//        // 履歴をリセット
+//        puyoGridHistory.removeAll()
+//        nextPuyoHistory.removeAll()
+//        currentHistoryIndex = -1
+//        //--------------------------
+        
+        
+        
+//        savePuyoGridState()
+        
+        
+        // なぜこれで解決しない???
+        puyoGridHistory.removeAll()
+        // 現在のグリッドとcurrentPuyosの状態を保存
+        let currentGrid = puyoGrid.grid.map { row in row.map { $0 } }
+        let currentState = PuyoGridState(grid: currentGrid, currentPuyos: currentPuyos)
+
+        // グリッドとcurrentPuyosの状態を保存
+        puyoGridHistory.append(currentState)
+        
+        
+        
+        
         if let savedData = UserDefaults.standard.data(forKey: name) {
             let decoder = JSONDecoder()
             if let loadedHistory = try? decoder.decode([[Puyo]].self, from: savedData) {
@@ -858,6 +1003,47 @@ struct ContentView: View {
         self.selectedHistoryName = ""  // 選択中の履歴名をリセット
         print("すべての履歴を削除しました")
     }
+    
+    // 色選択時に順番に追加
+    func addColorToSequence(_ color: PuyoColor) {
+        createdPuyoSequence.append(color)
+        print("選択された色: \(color)")  // デバッグ用の出力
+        // 必要ならここで選択された色の数を制限できます
+    }
+
+    // 保存時の処理
+    func saveCreatedHistory() {
+        var createdHistory: [[Puyo]] = []
+
+        // 選択された色の順番に基づいて、Puyo のペアを作成
+        for i in stride(from: 0, to: createdPuyoSequence.count, by: 2) {
+            let firstPuyoColor = createdPuyoSequence[i]
+            let secondPuyoColor = (i + 1 < createdPuyoSequence.count) ? createdPuyoSequence[i + 1] : createdPuyoSequence[i]
+            let firstPuyo = Puyo(color: firstPuyoColor, position: Position(x: 2, y: 0))
+            let secondPuyo = Puyo(color: secondPuyoColor, position: Position(x: 2, y: 1))
+            createdHistory.append([firstPuyo, secondPuyo])
+        }
+
+        print("履歴に保存するPuyoのペア: \(createdHistory)")  // デバッグ用の出力
+
+        // 作成した履歴を保存する
+        nextPuyoHistory = createdHistory  // 現在の履歴として保存
+        savedNextPuyoHistories.append(contentsOf: createdHistory)  // 履歴リストにも保存
+
+        // 履歴名で保存
+        saveNextPuyoHistoryToUserDefaults(withName: historyName)
+
+        // 選択状態をリセット
+        createdPuyoSequence = []
+        historyName = ""
+    }
+
+
+    // 履歴保存名を入力させるためのアラートを表示
+    func showSaveNameAlert() {
+        isShowingSaveAlert = true
+    }
+
 
 
 }
