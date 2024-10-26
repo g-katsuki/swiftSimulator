@@ -1,0 +1,5 @@
+# Xcode user-specific settings
+*.xcuserstate
+*.xcuserdata
+*.xcworkspace
+
