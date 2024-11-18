@@ -42,15 +42,36 @@
 
 import SwiftUI
 
+// 128手のループ
+var handLoop: [PuyoColor] = create128HandLoop()
+var currentHandIndex = 0
+
+
 // PuyoColor を Codable に準拠させる
 enum PuyoColor: String, Codable {
     case red, green, blue, yellow
 }
 
+func create128HandLoop() -> [PuyoColor] {
+    let colors: [PuyoColor] = [.red, .green, .blue, .yellow]
+    var hands: [PuyoColor] = []
+
+    // 各色を32個ずつ追加
+    for _ in 0..<16 {
+        hands.append(contentsOf: colors)
+    }
+
+    // 配列をシャッフル
+    hands.shuffle()
+    return hands
+}
+
+
 // ランダムな色を生成する関数
 func randomPuyoColor() -> PuyoColor {
-    let colors: [PuyoColor] = [.red, .green, .blue, .yellow]
-    return colors.randomElement() ?? .red
+    let color = handLoop[currentHandIndex]
+        currentHandIndex = (currentHandIndex + 1) % handLoop.count  // インデックスを進めてループ
+        return color
 }
 
 // 位置を表す構造体
