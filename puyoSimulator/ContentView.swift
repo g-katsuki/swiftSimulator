@@ -235,6 +235,9 @@ struct ContentView: View {
                 
                 // ネクストぷよを画面右上に縦に配置
                 VStack {
+                    Spacer()  // スペーサーを追加して全体を下げる
+                            .frame(height: 50)  // 下げる量を調整
+                    
                     VStack {
                         Text("Next")
                         ForEach(nextPuyos) { puyo in

@@ -57,7 +57,7 @@ func create128HandLoop() -> [PuyoColor] {
     var hands: [PuyoColor] = []
 
     // 各色を32個ずつ追加
-    for _ in 0..<16 {
+    for _ in 0..<32 {
         hands.append(contentsOf: colors)
     }
 
