@@ -3,17 +3,14 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C78BD47A2C9B0696001E9E49 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD4782C9B0696001E9E49 /* ViewController.swift */; };
-		C78BD47D2C9B0929001E9E49 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD47C2C9B091E001E9E49 /* GameState.swift */; };
 		C78BD47F2C9B093D001E9E49 /* PuyoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD47E2C9B0936001E9E49 /* PuyoView.swift */; };
-		C78BD4812C9B0959001E9E49 /* NextPuyoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD4802C9B0943001E9E49 /* NextPuyoView.swift */; };
-		C78BD4832C9DAF39001E9E49 /* GridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD4822C9DAF30001E9E49 /* GridView.swift */; };
 		C78BD4852C9DAF5E001E9E49 /* Puyo.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD4842C9DAF59001E9E49 /* Puyo.swift */; };
 		C78BD4872C9DAF7E001E9E49 /* PuyoGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD4862C9DAF74001E9E49 /* PuyoGrid.swift */; };
+		C7D08E112CFB528800CC99B1 /* PuyoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D08E102CFB527B00CC99B1 /* PuyoViewModel.swift */; };
 		C7D4D9652C8F2B870038BC5E /* puyoSimulatorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D4D9642C8F2B870038BC5E /* puyoSimulatorApp.swift */; };
 		C7D4D9672C8F2B870038BC5E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D4D9662C8F2B870038BC5E /* ContentView.swift */; };
 		C7D4D9692C8F2B890038BC5E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7D4D9682C8F2B890038BC5E /* Assets.xcassets */; };
@@ -21,19 +18,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C78BD4782C9B0696001E9E49 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		C78BD47C2C9B091E001E9E49 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
 		C78BD47E2C9B0936001E9E49 /* PuyoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuyoView.swift; sourceTree = "<group>"; };
-		C78BD4802C9B0943001E9E49 /* NextPuyoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextPuyoView.swift; sourceTree = "<group>"; };
-		C78BD4822C9DAF30001E9E49 /* GridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridView.swift; sourceTree = "<group>"; };
 		C78BD4842C9DAF59001E9E49 /* Puyo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Puyo.swift; sourceTree = "<group>"; };
 		C78BD4862C9DAF74001E9E49 /* PuyoGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuyoGrid.swift; sourceTree = "<group>"; };
+		C7D08E102CFB527B00CC99B1 /* PuyoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuyoViewModel.swift; sourceTree = "<group>"; };
 		C7D4D9612C8F2B870038BC5E /* puyoSimulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = puyoSimulator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7D4D9642C8F2B870038BC5E /* puyoSimulatorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = puyoSimulatorApp.swift; sourceTree = "<group>"; };
 		C7D4D9662C8F2B870038BC5E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C7D4D9682C8F2B890038BC5E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C7D4D96B2C8F2B890038BC5E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		C7D08E122CFB54E300CC99B1 /* Utils */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Utils; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		C7D4D95E2C8F2B870038BC5E /* Frameworks */ = {
@@ -49,26 +47,16 @@
 		C78BD4772C9B0687001E9E49 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				C7D08E102CFB527B00CC99B1 /* PuyoViewModel.swift */,
 				C78BD4862C9DAF74001E9E49 /* PuyoGrid.swift */,
 				C78BD4842C9DAF59001E9E49 /* Puyo.swift */,
-				C78BD47C2C9B091E001E9E49 /* GameState.swift */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		C78BD4792C9B0696001E9E49 /* Controllers */ = {
-			isa = PBXGroup;
-			children = (
-				C78BD4782C9B0696001E9E49 /* ViewController.swift */,
-			);
-			path = Controllers;
 			sourceTree = "<group>";
 		};
 		C78BD47B2C9B069C001E9E49 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				C78BD4822C9DAF30001E9E49 /* GridView.swift */,
-				C78BD4802C9B0943001E9E49 /* NextPuyoView.swift */,
 				C78BD47E2C9B0936001E9E49 /* PuyoView.swift */,
 			);
 			path = Views;
@@ -93,8 +81,8 @@
 		C7D4D9632C8F2B870038BC5E /* puyoSimulator */ = {
 			isa = PBXGroup;
 			children = (
+				C7D08E122CFB54E300CC99B1 /* Utils */,
 				C78BD47B2C9B069C001E9E49 /* Views */,
-				C78BD4792C9B0696001E9E49 /* Controllers */,
 				C78BD4772C9B0687001E9E49 /* Models */,
 				C7D4D9642C8F2B870038BC5E /* puyoSimulatorApp.swift */,
 				C7D4D9662C8F2B870038BC5E /* ContentView.swift */,
@@ -126,6 +114,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				C7D08E122CFB54E300CC99B1 /* Utils */,
 			);
 			name = puyoSimulator;
 			productName = puyoSimulator;
@@ -184,12 +175,9 @@
 			files = (
 				C78BD4872C9DAF7E001E9E49 /* PuyoGrid.swift in Sources */,
 				C78BD47F2C9B093D001E9E49 /* PuyoView.swift in Sources */,
-				C78BD47A2C9B0696001E9E49 /* ViewController.swift in Sources */,
 				C78BD4852C9DAF5E001E9E49 /* Puyo.swift in Sources */,
-				C78BD47D2C9B0929001E9E49 /* GameState.swift in Sources */,
-				C78BD4832C9DAF39001E9E49 /* GridView.swift in Sources */,
+				C7D08E112CFB528800CC99B1 /* PuyoViewModel.swift in Sources */,
 				C7D4D9672C8F2B870038BC5E /* ContentView.swift in Sources */,
-				C78BD4812C9B0959001E9E49 /* NextPuyoView.swift in Sources */,
 				C7D4D9652C8F2B870038BC5E /* puyoSimulatorApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -321,6 +309,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"puyoSimulator/Preview Content\"";
@@ -339,6 +328,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "g-katsuki.com.github.puyoSimulator";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -350,6 +340,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"puyoSimulator/Preview Content\"";
@@ -368,6 +359,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "g-katsuki.com.github.puyoSimulator";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
