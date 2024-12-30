@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var puyoGrid = PuyoGrid(width: 6, height: 13)
+    @State private var puyoGrid = PuyoGrid(width: 6, height: 14)
     @State private var currentPuyos: [Puyo] = []  // 現在操作中のぷよ
     @State private var nextPuyos: [Puyo] = []     // ネクストぷよ
     @State private var nextdPuyos: [Puyo] = []     // ダブルネクストぷよ
@@ -339,6 +339,13 @@ struct ContentView: View {
 
     func dropPuyosWithGravityAndRemoveAsync() {
         applyGravityToPuyos()  // まずぷよをすべて下に落とす
+        // 14段目を消す
+        var gridCopy = puyoGrid.grid  // `grid` を一時変数にコピー
+            for x in 0..<puyoGrid.width {  // 0 行のすべての列を反復
+                gridCopy[0][x] = nil
+            }
+        puyoGrid.grid = gridCopy  // 変更したグリッドを再代入
+        
         // 非同期に連鎖処理を行う
         DispatchQueue.global().async {
             while self.removeConnectedPuyos() {
@@ -390,8 +397,8 @@ struct ContentView: View {
         nextdPuyos = nextPuyos
         nextPuyos = currentPuyos
         // currentPuyoの位置ごと戻してしまうので初期位置に戻す
-        nextPuyos[0].position = Position(x: 2, y: 0)
-        nextPuyos[1].position = Position(x: 2, y: 1)
+        nextPuyos[0].position = Position(x: 2, y: 1)
+        nextPuyos[1].position = Position(x: 2, y: 2)
         
         currentHistoryIndex -= 1  // インデックスを1つ戻す
         let previousState = puyoGridHistory[currentHistoryIndex]  // 1つ前の状態を取得
@@ -431,7 +438,7 @@ struct ContentView: View {
                         ForEach(0..<puyoGrid.width, id: \.self) { column in
                             ZStack {
                                 // グリッドの背景
-                                if row == 0 {  // 13段目（プログラム上は12行目）
+                                if row <= 1 {  // 13段目（プログラム上は12行目）
                                     Rectangle()
                                         .fill(Color(white: 0.2))  // 13段目は少し暗めのグレー
                                         .frame(width: 40, height: 40)  // グリッドの各マスの大きさ
@@ -501,7 +508,7 @@ struct ContentView: View {
                 ]
                 
                 for neighbor in neighbors {
-                    if neighbor.y > 0 && neighbor.x >= 0 && neighbor.x < puyoGrid.width && neighbor.y < puyoGrid.height {
+                    if neighbor.y > 1 && neighbor.x >= 0 && neighbor.x < puyoGrid.width && neighbor.y < puyoGrid.height {
                         if let neighborPuyo = puyoGrid.grid[neighbor.y][neighbor.x],
                            neighborPuyo.color == startPuyo.color,
                            !visited.contains(neighbor) {
@@ -586,8 +593,8 @@ struct ContentView: View {
         for i in stride(from: 0, to: createdPuyoSequence.count, by: 2) {
             let firstPuyoColor = createdPuyoSequence[i]
             let secondPuyoColor = (i + 1 < createdPuyoSequence.count) ? createdPuyoSequence[i + 1] : createdPuyoSequence[i]
-            let firstPuyo = Puyo(color: firstPuyoColor, position: Position(x: 2, y: 0))
-            let secondPuyo = Puyo(color: secondPuyoColor, position: Position(x: 2, y: 1))
+            let firstPuyo = Puyo(color: firstPuyoColor, position: Position(x: 2, y: 1))
+            let secondPuyo = Puyo(color: secondPuyoColor, position: Position(x: 2, y: 2))
             createdHistory.append([firstPuyo, secondPuyo])
         }
         // 作成した履歴を保存する

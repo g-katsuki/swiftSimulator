@@ -15,16 +15,16 @@ func setupNewPuyos(
     nextPuyoHistory: inout [[Puyo]]
 ) {
     // 新しいぷよを生成
-    let firstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y: 0))
-    let secondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y: 1))
+    let firstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y: 1))
+    let secondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y: 2))
     currentPuyos = [firstPuyo, secondPuyo]
 
-    let nextFirstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y: 0))
-    let nextSecondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y: 1))
+    let nextFirstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y: 1))
+    let nextSecondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y: 2))
     nextPuyos = [nextFirstPuyo, nextSecondPuyo]
 
-    let nextdFirstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y: 0))
-    let nextdSecondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y: 1))
+    let nextdFirstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y: 1))
+    let nextdSecondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y: 2))
     nextdPuyos = [nextdFirstPuyo, nextdSecondPuyo]
 
     // グリッドに現在のぷよを追加

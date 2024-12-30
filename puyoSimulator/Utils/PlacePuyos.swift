@@ -28,8 +28,8 @@ func placePuyos(puyoGrid: inout PuyoGrid,
         nextdPuyos = nextPuyoHistory[currentHistoryIndex+3]
     } else {
         // 履歴がない場合、新しくネクストぷよを生成
-        let firstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  0))
-        let secondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  1))
+        let firstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  1))
+        let secondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  2))
         nextdPuyos = [firstPuyo, secondPuyo]
         
         nextPuyoHistory.append(nextdPuyos)
