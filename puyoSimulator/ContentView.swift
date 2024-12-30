@@ -253,37 +253,15 @@ struct ContentView: View {
                 .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topTrailing)  // 右上に配置
             }
             .onAppear {
-                setupNewPuyos()  // 最初のぷよとネクストぷよを表示
+                setupNewPuyos(puyoGrid: &puyoGrid,
+                              currentPuyos: &currentPuyos,
+                              nextPuyos: &nextPuyos,
+                              nextdPuyos: &nextdPuyos,
+                              nextPuyoHistory: &nextPuyoHistory)  // 最初のぷよとネクストぷよを表示
                 loadNextPuyoHistoryFromUserDefaults(withName: selectedHistoryName)  // 履歴をロード
                 loadHistoryNamesFromUserDefaults()  // 保存された履歴名をロード
             }
         }
-    }
-
-    // 新しいぷよのセットアップ
-    func setupNewPuyos() {
-        // 新しいぷよを生成
-        let firstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  0))
-        let secondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  1))
-        currentPuyos = [firstPuyo, secondPuyo]
-
-        let nextFirstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  0))
-        let nextSecondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  1))
-        nextPuyos = [nextFirstPuyo, nextSecondPuyo]
-        
-        let nextdFirstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  0))
-        let nextdSecondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  1))
-        nextdPuyos = [nextdFirstPuyo, nextdSecondPuyo]
-
-        // グリッドに現在のぷよを追加
-        puyoGrid.addPuyo(currentPuyos[0])
-        puyoGrid.addPuyo(currentPuyos[1])
-
-        // グリッドとぷよの状態を履歴に保存
-        savePuyoGridState()
-        nextPuyoHistory.append(currentPuyos)
-        nextPuyoHistory.append(nextPuyos)
-        nextPuyoHistory.append(nextdPuyos)
     }
 
     // ぷよを設置し、次のぷよを現在のぷよにする
@@ -510,7 +488,11 @@ struct ContentView: View {
         nextPuyoHistory.removeAll()
         currentHistoryIndex = -1
         // 最初のぷよを生成してゲームを再開
-        setupNewPuyos()
+        setupNewPuyos(puyoGrid: &puyoGrid,
+                      currentPuyos: &currentPuyos,
+                      nextPuyos: &nextPuyos,
+                      nextdPuyos: &nextdPuyos,
+                      nextPuyoHistory: &nextPuyoHistory)
     }
     
     struct GridView: View {
