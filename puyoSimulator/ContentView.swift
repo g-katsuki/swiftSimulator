@@ -796,27 +796,6 @@ struct ContentView: View {
         self.selectedHistoryName = ""  // 選択中の履歴名をリセット
     }
     
-    // 全削除
-    func deleteAllHistories() {
-        // すべての履歴名に対応するデータを削除
-        for name in savedHistoryNames {
-            if !name.isEmpty {
-                UserDefaults.standard.removeObject(forKey: name)  // 空でない名前の履歴を削除
-            }
-        }
-        
-        // 空の名前の履歴も削除
-        UserDefaults.standard.removeObject(forKey: "")
-        
-        // 履歴名リストを削除
-        savedHistoryNames.removeAll()
-        UserDefaults.standard.removeObject(forKey: "historyNames")
-        
-        // ローカル変数を更新
-        self.savedHistoryNames = []
-        self.selectedHistoryName = ""  // 選択中の履歴名をリセット
-    }
-    
     // 色選択時に順番に追加
     func addColorToSequence(_ color: PuyoColor) {
         createdPuyoSequence.append(color)
@@ -847,10 +826,5 @@ struct ContentView: View {
         historyName = ""
     }
 
-
-    // 履歴保存名を入力させるためのアラートを表示
-    func showSaveNameAlert() {
-        isShowingSaveAlert = true
-    }
 
 }
