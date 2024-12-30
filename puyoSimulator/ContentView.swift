@@ -264,33 +264,6 @@ struct ContentView: View {
         }
     }
 
-    // ぷよを設置し、次のぷよを現在のぷよにする
-    func placePuyos() {
-        currentPuyos = nextPuyos  // ネクストぷよをcurrentPuyosに移動
-        nextPuyos = nextdPuyos
-        
-        if (currentHistoryIndex == 0 || currentHistoryIndex == 1 || currentHistoryIndex == 2) &&
-            currentHistoryIndex < nextPuyoHistory.count - 3 {
-            nextdPuyos = nextPuyoHistory[currentHistoryIndex+3]
-        }
-        // ネクストぷよを履歴から復元するか、新しく生成
-        else if currentHistoryIndex < nextPuyoHistory.count - 3 {
-            // 履歴からネクストぷよを取得（次の履歴に進む）
-            nextdPuyos = nextPuyoHistory[currentHistoryIndex+3]
-        } else {
-            // 履歴がない場合、新しくネクストぷよを生成
-            let firstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  0))
-            let secondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  1))
-            nextdPuyos = [firstPuyo, secondPuyo]
-            
-            nextPuyoHistory.append(nextdPuyos)
-        }
-        // 現在のぷよをグリッドに追加
-        for puyo in currentPuyos {
-            puyoGrid.addPuyo(puyo)
-        }
-    }
-
     // ぷよを左に移動
     func movePuyosLeft() {
         _ = movePuyos(byX: -1, byY: 0)  // 戻り値を無視する
@@ -430,7 +403,12 @@ struct ContentView: View {
             }
             // 最後に新しいぷよを配置
             DispatchQueue.main.async {
-                self.placePuyos()
+                placePuyos(puyoGrid: &puyoGrid,
+                                currentPuyos: &currentPuyos,
+                                nextPuyos: &nextPuyos,
+                                nextdPuyos: &nextdPuyos,
+                                nextPuyoHistory: &nextPuyoHistory,
+                                currentHistoryIndex: &currentHistoryIndex)
                 savePuyoGridState()  // 状態を履歴に保存
             }
         }
