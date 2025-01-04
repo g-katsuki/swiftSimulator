@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var puyoGrid = PuyoGrid(width: 6, height: 13)
+    @State private var puyoGrid = PuyoGrid(width: 6, height: 14)
     @State private var currentPuyos: [Puyo] = []  // 現在操作中のぷよ
     @State private var nextPuyos: [Puyo] = []     // ネクストぷよ
     @State private var nextdPuyos: [Puyo] = []     // ダブルネクストぷよ
@@ -20,7 +20,6 @@ struct ContentView: View {
     @State private var isShowingSaveAlert = false  // アラート表示のフラグ
 
 
-
     var body: some View {
         GeometryReader { geometry in
             ZStack {
@@ -29,57 +28,32 @@ struct ContentView: View {
                 VStack {
                     GridView(puyoGrid: $puyoGrid)
                         .padding(.trailing, geometry.size.width * 0.2)
-
                     // 操作ボタンの配置
                     HStack {
                         Button(action: {
-                            movePuyosLeft()
+                            movePuyosLeft(puyoGrid: &puyoGrid, currentPuyos: &currentPuyos)
                         }) {
-                            Text("←")
-                                .frame(width: geometry.size.width * 0.15, height: geometry.size.width * 0.15)
-                                .background(Color.gray)
-                                .cornerRadius(10)
-                                .padding(geometry.size.width * 0.01)
+                            Text("←").frame(width: geometry.size.width * 0.15, height: geometry.size.width * 0.15).background(Color.gray).cornerRadius(10).padding(geometry.size.width * 0.01)
                         }
-
                         Button(action: {
                             dropPuyosWithGravityAndRemoveAsync()
                         }) {
-                            Text("↓")
-                                .frame(width: geometry.size.width * 0.12, height: geometry.size.width * 0.12)
-                                .background(Color.gray)
-                                .cornerRadius(10)
-                                .padding(geometry.size.width * 0.02)
+                            Text("↓").frame(width: geometry.size.width * 0.12, height: geometry.size.width * 0.12).background(Color.gray).cornerRadius(10).padding(geometry.size.width * 0.02)
                         }
-
                         Button(action: {
-                            movePuyosRight()
+                            movePuyosRight(puyoGrid: &puyoGrid, currentPuyos: &currentPuyos)
                         }) {
-                            Text("→")
-                                .frame(width: geometry.size.width * 0.15, height: geometry.size.width * 0.15)
-                                .background(Color.gray)
-                                .cornerRadius(10)
-                                .padding(geometry.size.width * 0.01)
+                            Text("→").frame(width: geometry.size.width * 0.15, height: geometry.size.width * 0.15).background(Color.gray).cornerRadius(10).padding(geometry.size.width * 0.01)
                         }
-
                         Button(action: {
-                            rotatePuyosLeft()
+                            rotatePuyosLeft(currentPuyos: &currentPuyos, puyoGrid: &puyoGrid)
                         }) {
-                            Text("L")
-                                .frame(width: geometry.size.width * 0.15, height: geometry.size.width * 0.15)
-                                .background(Color.gray)
-                                .cornerRadius(10)
-                                .padding(geometry.size.width * 0.015)
+                            Text("L").frame(width: geometry.size.width * 0.15, height: geometry.size.width * 0.15).background(Color.gray).cornerRadius(10).padding(geometry.size.width * 0.015)
                         }
-
                         Button(action: {
-                            rotatePuyosRight()
+                            rotatePuyosRight(currentPuyos: &currentPuyos, puyoGrid: &puyoGrid)
                         }) {
-                            Text("R")
-                                .frame(width: geometry.size.width * 0.15, height: geometry.size.width * 0.15)
-                                .background(Color.gray)
-                                .cornerRadius(10)
-                                .padding(geometry.size.width * 0.015)
+                            Text("R").frame(width: geometry.size.width * 0.15, height: geometry.size.width * 0.15).background(Color.gray).cornerRadius(10).padding(geometry.size.width * 0.015)
                         }
                     }
                     .padding()
@@ -92,31 +66,18 @@ struct ContentView: View {
                         }) {
                             Text("back").padding().background(Color.gray).cornerRadius(10)
                         }
-                        
-                        // ボタンの間にスペースを追加
-//                        Spacer()
-//                            .frame(width: geometry.size.width * 0.4, height: geometry.size.width * 0)
-                        
                         // 保存ボタン（押すとシートが表示される）
                         Button(action: {
                             isShowingSaveSheet = true  // シートを表示
                         }) {
-                            Text("save")
-                                .padding()
-                                .background(Color.blue)
-                                .foregroundColor(Color.white)
-                                .cornerRadius(10)
+                            Text("save").padding().background(Color.blue).foregroundColor(Color.white).cornerRadius(10)
                         }
                         .sheet(isPresented: $isShowingSaveSheet) {
                             VStack {
-                                Text("履歴の名前を入力")
-                                    .font(.headline)
-                                    .padding()
-
+                                Text("履歴の名前を入力").font(.headline).padding()
                                 TextField("履歴名", text: $historyName)  // `saveHistoryName` ではなく `historyName`
                                     .textFieldStyle(RoundedBorderTextFieldStyle())
                                     .padding()
-
                                 HStack {
                                     Button(action: {
                                         // 名前が空でない場合にのみ保存
@@ -125,21 +86,12 @@ struct ContentView: View {
                                             isShowingSaveSheet = false  // シートを閉じる
                                         }
                                     }) {
-                                        Text("保存")
-                                            .padding()
-                                            .background(Color.blue)
-                                            .foregroundColor(Color.white)
-                                            .cornerRadius(10)
+                                        Text("保存").padding().background(Color.blue).foregroundColor(Color.white).cornerRadius(10)
                                     }
-
                                     Button(action: {
                                         isShowingSaveSheet = false  // シートを閉じる
                                     }) {
-                                        Text("キャンセル")
-                                            .padding()
-                                            .background(Color.gray)
-                                            .foregroundColor(Color.white)
-                                            .cornerRadius(10)
+                                        Text("キャンセル").padding().background(Color.gray).foregroundColor(Color.white).cornerRadius(10)
                                     }
                                 }
                             }
@@ -150,19 +102,12 @@ struct ContentView: View {
                         Button(action: {
                             isShowingHistorySheet = true  // シートを表示
                         }) {
-                            Text("res")
-                                .padding()
-                                .background(Color.green)
-                                .foregroundColor(Color.white)
-                                .cornerRadius(10)
+                            Text("res").padding().background(Color.green).foregroundColor(Color.white).cornerRadius(10)
                         }
                         .sheet(isPresented: $isShowingHistorySheet) {
                             // シート内に履歴名のリストを表示して選択できるようにする
                             VStack {
-                                Text("履歴を選択")
-                                    .font(.headline)
-                                    .padding()
-
+                                Text("履歴を選択").font(.headline).padding()
                                 List {
                                     ForEach(savedHistoryNames, id: \.self) { name in
                                         Button(action: {
@@ -177,30 +122,21 @@ struct ContentView: View {
                             }
                         }
                         
-                        
                         // 履歴を削除するボタン
                         Button(action: {
                             isShowingDeleteSheet = true  // 削除用シートを表示
                         }) {
-                            Text("del")
-                                .padding()
-                                .background(Color.red)
-                                .foregroundColor(Color.white)
-                                .cornerRadius(10)
+                            Text("del").padding().background(Color.red).foregroundColor(Color.white).cornerRadius(10)
                         }
                         .sheet(isPresented: $isShowingDeleteSheet) {
                             VStack {
-                                Text("削除する履歴を選択")
-                                    .font(.headline)
-                                    .padding()
-
+                                Text("削除する履歴を選択").font(.headline).padding()
                                 List {
                                     ForEach(savedHistoryNames, id: \.self) { name in
                                         Button(action: {
                                             // 履歴名を保持してシートを閉じ、アラートを表示
                                             historyToDelete = name
                                             isShowingDeleteSheet = false  // シートを閉じる
-
                                             // シートが閉じた後、少し遅れてアラートを表示
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                                                 isShowingDeleteConfirmation = true  // 削除確認アラートを表示
@@ -223,7 +159,6 @@ struct ContentView: View {
                             )
                         }
 
-
                         Button(action: {
                             resetGame()
                         }) {
@@ -235,6 +170,9 @@ struct ContentView: View {
                 
                 // ネクストぷよを画面右上に縦に配置
                 VStack {
+                    Spacer()  // スペーサーを追加して全体を下げる
+                            .frame(height: 50)  // 下げる量を調整
+                    
                     VStack {
                         Text("Next")
                         ForEach(nextPuyos) { puyo in
@@ -256,50 +194,27 @@ struct ContentView: View {
                         Button(action: {
                             isShowingCreateSheet = true  // シートを開く
                         }) {
-                            Text("作成")
-                                .padding()
-                                .background(Color.blue)
-                                .foregroundColor(Color.white)
-                                .cornerRadius(10)
+                            Text("作成").padding().background(Color.blue).foregroundColor(Color.white).cornerRadius(10)
                         }
                         .sheet(isPresented: $isShowingCreateSheet) {
                             VStack {
-                                Text("ぷよの色を選択")
-                                    .font(.headline)
-                                    .padding()
-
+                                Text("ぷよの色を選択").font(.headline).padding()
                                 // 色の選択ボタン
                                 HStack {
                                     Button(action: { addColorToSequence(.red) }) {
-                                        Text("赤")
-                                            .padding()
-                                            .background(Color.red)
-                                            .foregroundColor(Color.white)
-                                            .cornerRadius(10)
+                                        Text("赤").padding().background(Color.red).foregroundColor(Color.white).cornerRadius(10)
                                     }
 
                                     Button(action: { addColorToSequence(.blue) }) {
-                                        Text("青")
-                                            .padding()
-                                            .background(Color.blue)
-                                            .foregroundColor(Color.white)
-                                            .cornerRadius(10)
+                                        Text("青").padding().background(Color.blue).foregroundColor(Color.white).cornerRadius(10)
                                     }
 
                                     Button(action: { addColorToSequence(.yellow) }) {
-                                        Text("黄")
-                                            .padding()
-                                            .background(Color.yellow)
-                                            .foregroundColor(Color.white)
-                                            .cornerRadius(10)
+                                        Text("黄").padding().background(Color.yellow).foregroundColor(Color.white).cornerRadius(10)
                                     }
 
                                     Button(action: { addColorToSequence(.green) }) {
-                                        Text("緑")
-                                            .padding()
-                                            .background(Color.green)
-                                            .foregroundColor(Color.white)
-                                            .cornerRadius(10)
+                                        Text("緑").padding().background(Color.green).foregroundColor(Color.white).cornerRadius(10)
                                     }
                                 }
                                 .padding()
@@ -309,31 +224,21 @@ struct ContentView: View {
                                     .padding()
 
                                 // 名前入力用のテキストフィールド
-                                TextField("履歴名", text: $historyName)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                                    .padding()
+                                TextField("履歴名", text: $historyName).textFieldStyle(RoundedBorderTextFieldStyle()).padding()
 
                                 // 保存ボタン
                                 Button(action: {
                                     saveCreatedHistory()  // 作成した履歴を保存
                                     isShowingCreateSheet = false  // シートを閉じる
                                 }) {
-                                    Text("保存")
-                                        .padding()
-                                        .background(Color.green)
-                                        .foregroundColor(Color.white)
-                                        .cornerRadius(10)
+                                    Text("保存").padding().background(Color.green).foregroundColor(Color.white).cornerRadius(10)
                                 }
 
                                 // キャンセルボタン
                                 Button(action: {
                                     isShowingCreateSheet = false  // シートを閉じる
                                 }) {
-                                    Text("キャンセル")
-                                        .padding()
-                                        .background(Color.gray)
-                                        .foregroundColor(Color.white)
-                                        .cornerRadius(10)
+                                    Text("キャンセル").padding().background(Color.gray).foregroundColor(Color.white).cornerRadius(10)
                                 }
                             }
                             .padding()
@@ -347,264 +252,17 @@ struct ContentView: View {
                 .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topTrailing)  // 右上に配置
             }
             .onAppear {
-                setupNewPuyos()  // 最初のぷよとネクストぷよを表示
+                setupNewPuyos(puyoGrid: &puyoGrid,
+                              currentPuyos: &currentPuyos,
+                              nextPuyos: &nextPuyos,
+                              nextdPuyos: &nextdPuyos,
+                              nextPuyoHistory: &nextPuyoHistory)  // 最初のぷよとネクストぷよを表示
                 loadNextPuyoHistoryFromUserDefaults(withName: selectedHistoryName)  // 履歴をロード
                 loadHistoryNamesFromUserDefaults()  // 保存された履歴名をロード
             }
         }
     }
-
-    // 新しいぷよのセットアップ
-    func setupNewPuyos() {
-
-        // 新しいぷよを生成
-        let firstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  0))
-        let secondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  1))
-        currentPuyos = [firstPuyo, secondPuyo]
-
-        let nextFirstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  0))
-        let nextSecondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  1))
-        nextPuyos = [nextFirstPuyo, nextSecondPuyo]
-        
-        let nextdFirstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  0))
-        let nextdSecondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  1))
-        nextdPuyos = [nextdFirstPuyo, nextdSecondPuyo]
-
-        // グリッドに現在のぷよを追加
-        puyoGrid.addPuyo(currentPuyos[0])
-        puyoGrid.addPuyo(currentPuyos[1])
-
-        // グリッドとぷよの状態を履歴に保存
-        savePuyoGridState()
-        nextPuyoHistory.append(currentPuyos)
-        nextPuyoHistory.append(nextPuyos)
-        nextPuyoHistory.append(nextdPuyos)
-    }
-
-    // ぷよを設置し、次のぷよを現在のぷよにする
-    func placePuyos() {
-        
-        currentPuyos = nextPuyos  // ネクストぷよをcurrentPuyosに移動
-        nextPuyos = nextdPuyos
-        
-        if (currentHistoryIndex == 0 || currentHistoryIndex == 1 || currentHistoryIndex == 2) &&
-            currentHistoryIndex < nextPuyoHistory.count - 3 {
-            nextdPuyos = nextPuyoHistory[currentHistoryIndex+3]
-        }
-        // ネクストぷよを履歴から復元するか、新しく生成
-        else if currentHistoryIndex < nextPuyoHistory.count - 3 {
-            // 履歴からネクストぷよを取得（次の履歴に進む）
-            nextdPuyos = nextPuyoHistory[currentHistoryIndex+3]
-        } else {
-            // 履歴がない場合、新しくネクストぷよを生成
-            let firstPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  0))
-            let secondPuyo = Puyo(color: randomPuyoColor(), position: Position(x: 2, y:  1))
-            nextdPuyos = [firstPuyo, secondPuyo]
-            
-            nextPuyoHistory.append(nextdPuyos)
-        }
-
-        // 現在のぷよをグリッドに追加
-        for puyo in currentPuyos {
-            puyoGrid.addPuyo(puyo)
-        }
-
-    }
-
-    // ぷよを左に移動
-    func movePuyosLeft() {
-        _ = movePuyos(byX: -1, byY: 0)  // 戻り値を無視する
-    }
-
-    // ぷよを右に移動
-    func movePuyosRight() {
-        _ = movePuyos(byX: 1, byY: 0)  // 戻り値を無視する
-    }
-
-    // 戻り値として「移動できるかどうか」を返すようにする
-    func movePuyos(byX deltaX: Int, byY deltaY: Int) -> Bool {
-        var canMove = true
-
-        // 全てのぷよについて移動後の位置がすべてグリッドの範囲内で空いているか確認
-        for (_, puyo) in currentPuyos.enumerated() {
-            let newX = puyo.position.x + deltaX
-            let newY = puyo.position.y + deltaY
-
-            // 移動できない条件がある場合
-            if newX < 0 || newX >= puyoGrid.width || newY < 0 || newY >= puyoGrid.height {
-                canMove = false
-                break
-            }
-
-            // 他のぷよに衝突しないか確認（同じ組ぷよは無視）
-            if let otherPuyo = puyoGrid.grid[newY][newX] {
-                if !currentPuyos.contains(where: { $0.id == otherPuyo.id }) {
-                    canMove = false
-                    break
-                }
-            }
-        }
-
-        // 移動可能ならすべてのぷよを移動させる
-        if canMove {
-            // まずはすべてのぷよをグリッドから削除
-            for puyo in currentPuyos {
-                puyoGrid.removePuyo(at: (puyo.position.x, puyo.position.y))
-            }
-
-            // 新しい位置にすべてのぷよを移動
-            for i in 0..<currentPuyos.count {
-                currentPuyos[i].position.x += deltaX
-                currentPuyos[i].position.y += deltaY
-            }
-
-            // 新しい位置にすべてのぷよを追加
-            for puyo in currentPuyos {
-                puyoGrid.addPuyo(puyo)
-            }
-        }
-
-        return canMove
-    }
     
-    func rotatePuyosRight() {
-        let axisPuyo = currentPuyos[1]  // 軸ぷよ
-        let childPuyo = currentPuyos[0]  // 子ぷよ
-        
-        if childPuyo.position.x == 0 && childPuyo.position.x < axisPuyo.position.x {
-            return
-        }
-
-        // 子ぷよの相対的な位置を計算し、右回転（時計回り）
-        let relativeX = childPuyo.position.x - axisPuyo.position.x
-        let relativeY = childPuyo.position.y - axisPuyo.position.y
-        var newChildPuyoPosition: (Int, Int) = (axisPuyo.position.x - relativeY, axisPuyo.position.y + relativeX)
-        var newParentPuyoPosition: (Int, Int) = (axisPuyo.position.x, axisPuyo.position.x)
-
-        if axisPuyo.position.x - relativeY >= puyoGrid.width {
-            newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
-            newParentPuyoPosition = (axisPuyo.position.x - 1, axisPuyo.position.y + relativeX)
-        }
-        else if axisPuyo.position.x - relativeY == -1 {
-            newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
-            newParentPuyoPosition = (axisPuyo.position.x + 1, axisPuyo.position.y + relativeX)
-        } else { // 壁とは離れている
-            if puyoGrid.grid[newChildPuyoPosition.1][newChildPuyoPosition.0] != nil { // ぷよに衝突
-                if relativeY < 0 { // 子ぷよが上
-                    newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
-                    newParentPuyoPosition = (axisPuyo.position.x - 1, axisPuyo.position.y + relativeX)
-                    if puyoGrid.grid[newParentPuyoPosition.1][newParentPuyoPosition.0] != nil { // rotete 180
-                        newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX + 1)
-                        newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
-                        if puyoGrid.grid[newChildPuyoPosition.1][newChildPuyoPosition.0] != nil { // 180の先にぷよが存在
-                            newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
-                            newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX - 1)
-                        }
-                    }
-                } else if relativeY > 0 { // 子ぷよが下
-                    newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
-                    newParentPuyoPosition = (axisPuyo.position.x + 1, axisPuyo.position.y + relativeX)
-                    if puyoGrid.grid[newParentPuyoPosition.1][newParentPuyoPosition.0] != nil { // rotete 180
-                        newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX - 1)
-                        newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
-                    }
-                } else {
-                    newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX - 1)
-                    newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX - 2)
-                }
-            } else {
-                newChildPuyoPosition = (axisPuyo.position.x - relativeY, axisPuyo.position.y + relativeX)
-                newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y)
-            }
-        }
-        
-        // 移動先が範囲外なら何もせず終了
-        if newChildPuyoPosition.1 < 0 || newParentPuyoPosition.1 < 0 {
-            return
-        }
-        
-        // グリッドから古い位置のぷよを削除
-        puyoGrid.removePuyo(at: (childPuyo.position.x, childPuyo.position.y))
-        puyoGrid.removePuyo(at: (axisPuyo.position.x, axisPuyo.position.y))
-
-        // 新しい位置にぷよを移動
-        currentPuyos[0].position = Position(x: newChildPuyoPosition.0, y: newChildPuyoPosition.1)
-        currentPuyos[1].position = Position(x: newParentPuyoPosition.0, y: newParentPuyoPosition.1)
-        
-        // グリッドに新しい位置のぷよを追加
-        puyoGrid.addPuyo(currentPuyos[0])
-        puyoGrid.addPuyo(currentPuyos[1])
-    }
-
-    func rotatePuyosLeft() {
-        let axisPuyo = currentPuyos[1]  // 軸ぷよ
-        let childPuyo = currentPuyos[0]  // 子ぷよ
-        
-        if childPuyo.position.y == 0 && childPuyo.position.x > axisPuyo.position.x {
-            return
-        }
-
-        // 子ぷよの相対的な位置を計算し、左回転
-        let relativeX = childPuyo.position.x - axisPuyo.position.x
-        let relativeY = childPuyo.position.y - axisPuyo.position.y
-        var newChildPuyoPosition: (Int, Int) = (axisPuyo.position.x + relativeY, axisPuyo.position.y - relativeX)
-        var newParentPuyoPosition: (Int, Int) = (axisPuyo.position.x, axisPuyo.position.x)
-
-        if axisPuyo.position.x + relativeY >= puyoGrid.width {
-            newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
-            newParentPuyoPosition = (axisPuyo.position.x - 1, axisPuyo.position.y + relativeX)
-        }
-        else if axisPuyo.position.x + relativeY == -1 {
-            newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y - relativeX)
-            newParentPuyoPosition = (axisPuyo.position.x + 1, axisPuyo.position.y + relativeX)
-        } else { // 壁とは離れている
-            if puyoGrid.grid[newChildPuyoPosition.1][newChildPuyoPosition.0] != nil { // ぷよに衝突
-                if relativeY < 0 { // 子ぷよが上
-                    newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y - relativeX)
-                    newParentPuyoPosition = (axisPuyo.position.x + 1, axisPuyo.position.y + relativeX)
-                    if puyoGrid.grid[newParentPuyoPosition.1][newParentPuyoPosition.0] != nil { // rotete 180
-                        newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX + 1)
-                        newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
-                        if puyoGrid.grid[newChildPuyoPosition.1][newChildPuyoPosition.0] != nil { // 180の先にぷよが存在
-                            newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
-                            newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX - 1)
-                        }
-                    }
-                } else if relativeY > 0 { // 子ぷよが下
-                    newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
-                    newParentPuyoPosition = (axisPuyo.position.x - 1, axisPuyo.position.y + relativeX)
-                    if puyoGrid.grid[newParentPuyoPosition.1][newParentPuyoPosition.0] != nil { // rotete 180
-                        newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX - 1)
-                        newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
-                    }
-                } else {
-                    newChildPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX + 1)
-                    newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y + relativeX)
-                }
-            } else {
-                newChildPuyoPosition = (axisPuyo.position.x + relativeY, axisPuyo.position.y - relativeX)
-                newParentPuyoPosition = (axisPuyo.position.x, axisPuyo.position.y)
-            }
-        }
-        
-        // 移動先が範囲外なら何もせず終了
-        if newChildPuyoPosition.1 < 0 || newParentPuyoPosition.1 < 0 {
-            return
-        }
-        
-        // グリッドから古い位置のぷよを削除
-        puyoGrid.removePuyo(at: (childPuyo.position.x, childPuyo.position.y))
-        puyoGrid.removePuyo(at: (axisPuyo.position.x, axisPuyo.position.y))
-
-        // 新しい位置にぷよを移動
-        currentPuyos[0].position = Position(x: newChildPuyoPosition.0, y: newChildPuyoPosition.1)
-        currentPuyos[1].position = Position(x: newParentPuyoPosition.0, y: newParentPuyoPosition.1)
-
-        // グリッドに新しい位置のぷよを追加
-        puyoGrid.addPuyo(currentPuyos[0])
-        puyoGrid.addPuyo(currentPuyos[1])
-    }
-
     func applyGravityToPuyos() {
         // グリッド全体を下から上に向かってスキャン
         for y in (0..<puyoGrid.height).reversed() {  // 下から上へ
@@ -612,7 +270,6 @@ struct ContentView: View {
                 // ぷよがある場合
                 if var puyo = puyoGrid.grid[y][x] {
                     var currentY = y
-
                     // 下が空いている限り、ぷよを下まで落とす
                     while currentY + 1 < puyoGrid.height && puyoGrid.grid[currentY + 1][x] == nil {
                         puyoGrid.removePuyo(at: (x, currentY))  // 現在の位置から削除
@@ -624,7 +281,6 @@ struct ContentView: View {
             }
         }
     }
-
     
     func findConnectedPuyos(from start: Position) -> [Position] {
         guard let startPuyo = puyoGrid.grid[start.y][start.x] else { return [] }
@@ -656,21 +312,17 @@ struct ContentView: View {
                 }
             }
         }
-
         return connectedPuyos
     }
-
     
     func removeConnectedPuyos() -> Bool {
         var removed = false
         var visited = Set<Position>()
-
         // グリッド全体をスキャン
         for y in 1..<puyoGrid.height {
             for x in 0..<puyoGrid.width {
                 if let _ = puyoGrid.grid[y][x], !visited.contains(Position(x: x, y: y)) {
                     let connectedPuyos = findConnectedPuyos(from: Position(x: x, y: y))
-
                     // 4つ以上連結していたら消す
                     if connectedPuyos.count >= 4 {
                         for position in connectedPuyos {
@@ -687,6 +339,13 @@ struct ContentView: View {
 
     func dropPuyosWithGravityAndRemoveAsync() {
         applyGravityToPuyos()  // まずぷよをすべて下に落とす
+        // 14段目を消す
+        var gridCopy = puyoGrid.grid  // `grid` を一時変数にコピー
+            for x in 0..<puyoGrid.width {  // 0 行のすべての列を反復
+                gridCopy[0][x] = nil
+            }
+        puyoGrid.grid = gridCopy  // 変更したグリッドを再代入
+        
         // 非同期に連鎖処理を行う
         DispatchQueue.global().async {
             while self.removeConnectedPuyos() {
@@ -699,7 +358,12 @@ struct ContentView: View {
             }
             // 最後に新しいぷよを配置
             DispatchQueue.main.async {
-                self.placePuyos()
+                placePuyos(puyoGrid: &puyoGrid,
+                                currentPuyos: &currentPuyos,
+                                nextPuyos: &nextPuyos,
+                                nextdPuyos: &nextdPuyos,
+                                nextPuyoHistory: &nextPuyoHistory,
+                                currentHistoryIndex: &currentHistoryIndex)
                 savePuyoGridState()  // 状態を履歴に保存
             }
         }
@@ -717,18 +381,15 @@ struct ContentView: View {
         // 現在のグリッドとcurrentPuyosの状態を保存
         let currentGrid = puyoGrid.grid.map { row in row.map { $0 } }
         let currentState = PuyoGridState(grid: currentGrid, currentPuyos: currentPuyos)
-
         // グリッド履歴を上書きする場合
         if currentHistoryIndex < puyoGridHistory.count - 1 {
             puyoGridHistory = Array(puyoGridHistory.prefix(currentHistoryIndex + 1))
         }
-
         // グリッドとcurrentPuyosの状態を保存
         puyoGridHistory.append(currentState)
 
         currentHistoryIndex += 1  // インデックスを進める
     }
-
 
     func restorePuyoGridState() {
         guard currentHistoryIndex > 0 else { return }  // インデックスが0より大きい場合のみ戻す
@@ -736,8 +397,8 @@ struct ContentView: View {
         nextdPuyos = nextPuyos
         nextPuyos = currentPuyos
         // currentPuyoの位置ごと戻してしまうので初期位置に戻す
-        nextPuyos[0].position = Position(x: 2, y: 0)
-        nextPuyos[1].position = Position(x: 2, y: 1)
+        nextPuyos[0].position = Position(x: 2, y: 1)
+        nextPuyos[1].position = Position(x: 2, y: 2)
         
         currentHistoryIndex -= 1  // インデックスを1つ戻す
         let previousState = puyoGridHistory[currentHistoryIndex]  // 1つ前の状態を取得
@@ -752,20 +413,20 @@ struct ContentView: View {
                 puyoGrid.grid[y][x] = nil
             }
         }
-        
         // 現在のぷよとネクストぷよをリセット
         currentPuyos.removeAll()
         nextPuyos.removeAll()
-
         // 履歴をリセット
         puyoGridHistory.removeAll()
         nextPuyoHistory.removeAll()
         currentHistoryIndex = -1
-
         // 最初のぷよを生成してゲームを再開
-        setupNewPuyos()
+        setupNewPuyos(puyoGrid: &puyoGrid,
+                      currentPuyos: &currentPuyos,
+                      nextPuyos: &nextPuyos,
+                      nextdPuyos: &nextdPuyos,
+                      nextPuyoHistory: &nextPuyoHistory)
     }
-
     
     struct GridView: View {
         @Binding var puyoGrid: PuyoGrid
@@ -777,7 +438,7 @@ struct ContentView: View {
                         ForEach(0..<puyoGrid.width, id: \.self) { column in
                             ZStack {
                                 // グリッドの背景
-                                if row == 0 {  // 13段目（プログラム上は12行目）
+                                if row <= 1 {  // 13段目（プログラム上は12行目）
                                     Rectangle()
                                         .fill(Color(white: 0.2))  // 13段目は少し暗めのグレー
                                         .frame(width: 40, height: 40)  // グリッドの各マスの大きさ
@@ -787,12 +448,10 @@ struct ContentView: View {
                                         .fill(Color(white: 0.3))  // グリッドの背景色を設定
                                         .frame(width: 40, height: 40)  // グリッドの各マスの大きさ
                                 }
-
                                 // ぷよが存在する場合、そのぷよを描画
                                 if let puyo = puyoGrid.grid[row][column] {
                                     // findConnectedPuyosを使って連結状態を取得
                                     let connectedPuyos = findConnectedPuyos(from: Position(x: column, y: row))
-                                    
                                     // 連結している場合、連結部分に長方形を描画
                                     if isConnected(at: (row, column), to: (row, column - 1), in: connectedPuyos) {
                                         Rectangle()
@@ -807,7 +466,6 @@ struct ContentView: View {
                                             .frame(width: 20, height: 20)  // 上下の連結を表現
                                             .offset(y: -20)  // 上にずらす
                                     }
-
                                     // ぷよ自体の描画
                                     PuyoView(puyo: puyo)
                                         .frame(width: 30, height: 30)
@@ -822,7 +480,6 @@ struct ContentView: View {
         // ぷよが特定の隣の位置と連結しているかどうかを判定する関数
         func isConnected(at currentPosition: (Int, Int), to neighborPosition: (Int, Int), in connectedPuyos: [Position]) -> Bool {
             let (neighborRow, neighborColumn) = neighborPosition
-            
             // 隣接している場所がグリッドの範囲内であり、連結している場合に true を返す
             if neighborRow >= 0 && neighborRow < puyoGrid.height &&
                neighborColumn >= 0 && neighborColumn < puyoGrid.width {
@@ -851,7 +508,7 @@ struct ContentView: View {
                 ]
                 
                 for neighbor in neighbors {
-                    if neighbor.y > 0 && neighbor.x >= 0 && neighbor.x < puyoGrid.width && neighbor.y < puyoGrid.height {
+                    if neighbor.y > 1 && neighbor.x >= 0 && neighbor.x < puyoGrid.width && neighbor.y < puyoGrid.height {
                         if let neighborPuyo = puyoGrid.grid[neighbor.y][neighbor.x],
                            neighborPuyo.color == startPuyo.color,
                            !visited.contains(neighbor) {
@@ -869,17 +526,14 @@ struct ContentView: View {
         let encoder = JSONEncoder()
         if let encoded = try? encoder.encode(nextPuyoHistory) {
             UserDefaults.standard.set(encoded, forKey: name)
-
             // 保存した名前をリストに追加
             var savedHistoryNames = UserDefaults.standard.stringArray(forKey: "historyNames") ?? []
             savedHistoryNames.append(name)
             UserDefaults.standard.set(savedHistoryNames, forKey: "historyNames")
-            
             // ローカル変数にも即座に反映
             self.savedHistoryNames = savedHistoryNames
         }
     }
-
 
     func loadNextPuyoHistoryFromUserDefaults(withName name: String) {
         
@@ -887,7 +541,6 @@ struct ContentView: View {
         // 現在のグリッドとcurrentPuyosの状態を保存
         let currentGrid = puyoGrid.grid.map { row in row.map { $0 } }
         let currentState = PuyoGridState(grid: currentGrid, currentPuyos: currentPuyos)
-
         // グリッドとcurrentPuyosの状態を保存
         puyoGridHistory.append(currentState)
         
@@ -895,7 +548,6 @@ struct ContentView: View {
             let decoder = JSONDecoder()
             if let loadedHistory = try? decoder.decode([[Puyo]].self, from: savedData) {
                 nextPuyoHistory = loadedHistory
-                
                 // currentPuyos, nextPuyos, nextdPuyos を復元
                 if nextPuyoHistory.count >= 3 {
                     // 古いcurrentPuyosを削除
@@ -920,34 +572,11 @@ struct ContentView: View {
     func deleteHistory(withName name: String) {
         // 履歴名に対応するデータを削除
         UserDefaults.standard.removeObject(forKey: name)
-        
         // 履歴名リストからも削除
         savedHistoryNames.removeAll { $0 == name }
         UserDefaults.standard.set(savedHistoryNames, forKey: "historyNames")
-        
         // ローカル変数も更新
         self.savedHistoryNames = savedHistoryNames
-        self.selectedHistoryName = ""  // 選択中の履歴名をリセット
-    }
-    
-    // 全削除
-    func deleteAllHistories() {
-        // すべての履歴名に対応するデータを削除
-        for name in savedHistoryNames {
-            if !name.isEmpty {
-                UserDefaults.standard.removeObject(forKey: name)  // 空でない名前の履歴を削除
-            }
-        }
-        
-        // 空の名前の履歴も削除
-        UserDefaults.standard.removeObject(forKey: "")
-        
-        // 履歴名リストを削除
-        savedHistoryNames.removeAll()
-        UserDefaults.standard.removeObject(forKey: "historyNames")
-        
-        // ローカル変数を更新
-        self.savedHistoryNames = []
         self.selectedHistoryName = ""  // 選択中の履歴名をリセット
     }
     
@@ -964,27 +593,18 @@ struct ContentView: View {
         for i in stride(from: 0, to: createdPuyoSequence.count, by: 2) {
             let firstPuyoColor = createdPuyoSequence[i]
             let secondPuyoColor = (i + 1 < createdPuyoSequence.count) ? createdPuyoSequence[i + 1] : createdPuyoSequence[i]
-            let firstPuyo = Puyo(color: firstPuyoColor, position: Position(x: 2, y: 0))
-            let secondPuyo = Puyo(color: secondPuyoColor, position: Position(x: 2, y: 1))
+            let firstPuyo = Puyo(color: firstPuyoColor, position: Position(x: 2, y: 1))
+            let secondPuyo = Puyo(color: secondPuyoColor, position: Position(x: 2, y: 2))
             createdHistory.append([firstPuyo, secondPuyo])
         }
-
         // 作成した履歴を保存する
         nextPuyoHistory = createdHistory  // 現在の履歴として保存
         savedNextPuyoHistories.append(contentsOf: createdHistory)  // 履歴リストにも保存
-
         // 履歴名で保存
         saveNextPuyoHistoryToUserDefaults(withName: historyName)
-
         // 選択状態をリセット
         createdPuyoSequence = []
         historyName = ""
-    }
-
-
-    // 履歴保存名を入力させるためのアラートを表示
-    func showSaveNameAlert() {
-        isShowingSaveAlert = true
     }
 
 }

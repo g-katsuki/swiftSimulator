@@ -1,56 +1,36 @@
-//
-//  Puyo.swift
-//  puyoSimulator
-//
-//  Created by Katsuki Go on 2024/09/20.
-//
-
-//import SwiftUI
-//
-//enum PuyoColor {
-//    case red, green, blue, yellow
-//}
-//
-//// ランダムな色を生成する関数
-//func randomPuyoColor() -> PuyoColor {
-//    let colors: [PuyoColor] = [.red, .green, .blue, .yellow]
-//    return colors.randomElement() ?? .red
-//}
-//
-//struct Puyo: Identifiable {
-//    var id = UUID()  // 一意のIDを持つ
-//    var color: PuyoColor
-//    var position: (Int, Int)
-//}
-//
-//extension PuyoColor {
-//    // PuyoColor を SwiftUI の Color に変換
-//    var swiftUIColor: Color {
-//        switch self {
-//        case .red:
-//            return Color.red
-//        case .blue:
-//            return Color.blue
-//        case .green:
-//            return Color.green
-//        case .yellow:
-//            return Color.yellow
-//        }
-//    }
-//}
-
 
 import SwiftUI
+
+// 128手のループ
+var handLoop: [PuyoColor] = create128HandLoop()
+var currentHandIndex = 0
+
 
 // PuyoColor を Codable に準拠させる
 enum PuyoColor: String, Codable {
     case red, green, blue, yellow
 }
 
+func create128HandLoop() -> [PuyoColor] {
+    let colors: [PuyoColor] = [.red, .green, .blue, .yellow]
+    var hands: [PuyoColor] = []
+
+    // 各色を32個ずつ追加
+    for _ in 0..<32 {
+        hands.append(contentsOf: colors)
+    }
+
+    // 配列をシャッフル
+    hands.shuffle()
+    return hands
+}
+
+
 // ランダムな色を生成する関数
 func randomPuyoColor() -> PuyoColor {
-    let colors: [PuyoColor] = [.red, .green, .blue, .yellow]
-    return colors.randomElement() ?? .red
+    let color = handLoop[currentHandIndex]
+        currentHandIndex = (currentHandIndex + 1) % handLoop.count  // インデックスを進めてループ
+        return color
 }
 
 // 位置を表す構造体
